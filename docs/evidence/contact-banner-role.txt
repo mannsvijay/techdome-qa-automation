@@ -1,0 +1,71 @@
+=== Elements with role="alert" or role="status" after the failed (500) submission ===
+
+role=alert count: 1
+  [0] id="__next-route-announcer__" aria-live="assertive" visible=true text=""
+
+role=status count: 0
+
+Banner text match count: 1
+Ancestor chain from the banner text up to (and including) the first role-bearing ancestor:
+[
+  {
+    "tag": "P",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "SECTION",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "DIV",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "MAIN",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "BODY",
+    "role": null,
+    "ariaLive": null
+  },
+  {
+    "tag": "HTML",
+    "role": null,
+    "ariaLive": null
+  }
+]

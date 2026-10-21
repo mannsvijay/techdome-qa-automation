@@ -27,6 +27,13 @@ export const test = base.extend({
     // events into Techdome's real GA property.
     await page.route('**/g/collect**', (route) => route.abort());
 
+    // Default safety net: unconditionally abort every request to the real lead-submission
+    // endpoint, so no test can ever send a real enquiry even if it forgets to mock this
+    // itself (confirmed endpoint: docs/evidence/contact-submit-inspection.txt). Playwright
+    // runs the most-recently-registered matching route first, so a test that calls
+    // page.route('**/api/leads', ...) of its own takes precedence over this one.
+    await page.route('**/api/leads', (route) => route.abort());
+
     await use(page);
   },
 });

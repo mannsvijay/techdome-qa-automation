@@ -55,7 +55,13 @@ test.describe('US-003 / US-004: Contact form validation and step transition', ()
   test('valid required fields advance to step 2 with the expected engagement options', async ({ page }) => {
     const nonGetToTechdome: string[] = [];
     page.on('request', (request) => {
-      if (request.method() !== 'GET' && request.url().includes('techdome.io')) {
+      if (request.method() === 'GET') return;
+      // Compare the hostname, not a substring of the full URL — GA beacon URLs carry
+      // "techdome.io" inside an encoded `dl=` (document location) query parameter, which
+      // a substring check would wrongly match even though the request itself goes to
+      // google-analytics.com/google.com.
+      const hostname = new URL(request.url()).hostname;
+      if (hostname === 'techdome.io' || hostname === 'www.techdome.io') {
         nonGetToTechdome.push(`${request.method()} ${request.url()}`);
       }
     });
@@ -86,5 +92,33 @@ test.describe('US-003 / US-004: Contact form validation and step transition', ()
     expect(selectedOptionText).toBe('Select…');
 
     expect(nonGetToTechdome).toEqual([]);
+  });
+
+  test('a failed submission shows the error banner and stays on step 2', async ({ page }) => {
+    await page.route('**/api/leads', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+
+    await contactPage.fillFullLead({
+      firstName: 'QA Test',
+      workEmail: 'qa-test@example.com',
+      whatDoYouNeed: 'Engineering Pods / Staff Augmentation',
+      requirement: 'QA automation test - please ignore',
+      teamSize: '1–2',
+      timeline: 'Immediately',
+      budget: 'Not decided',
+    });
+
+    await contactPage.findATimeButton.click();
+
+    // Confirmed in docs/evidence/contact-banner-role.txt: the only role="alert"/"status"
+    // element on this page is Next.js's own persistent, always-empty route announcer
+    // (#__next-route-announcer__) — the banner itself has no ARIA role at all, and its
+    // ancestor chain (<p> -> plain <div>s -> <section> -> <main> -> <body>) has no <form>
+    // or other landmark to scope to either. A page-level text locator is the only option
+    // here — the same deliberate exception as the "Required." check above.
+    const banner = page.getByText("We couldn't submit your request right now. Please try again.", { exact: true });
+    await expect(banner).toBeVisible();
+
+    await expect(contactPage.whatDoYouNeedSelect).toBeVisible();
+    await expect(contactPage.teamSizeNeededSelect).toBeVisible();
   });
 });

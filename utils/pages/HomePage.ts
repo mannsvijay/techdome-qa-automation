@@ -17,6 +17,14 @@ export class HomePage {
   readonly newsletterDialog: Locator;
   readonly newsletterCloseButton: Locator;
 
+  // Mobile/tablet only (<lg breakpoint): observed at 375x812 and 768x1024 — the header
+  // CTAs/menu buttons are hidden and replaced by this single toggle button, which opens
+  // a full-screen role="dialog" (id="mobile-nav", aria-label="Site Navigation")
+  // containing its own Services/Portfolio/Insights/Company buttons.
+  readonly mobileNavToggle: Locator;
+  readonly mobileNavDialog: Locator;
+  readonly mobileNavCloseButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.header = page.getByRole('banner');
@@ -30,6 +38,17 @@ export class HomePage {
     // the visual "Techdome newsletter" eyebrow text, which plays no part in its ARIA name.
     this.newsletterDialog = page.getByRole('dialog', { name: 'One engineering note, every other Monday.' });
     this.newsletterCloseButton = this.newsletterDialog.getByRole('button', { name: 'Close newsletter pop-up' });
+
+    // Same element throughout — its accessible name flips between "Open navigation" and
+    // "Close navigation" depending on aria-expanded, so one regex-based locator covers both.
+    this.mobileNavToggle = this.header.getByRole('button', { name: /^(Open|Close) navigation$/ });
+    this.mobileNavDialog = page.getByRole('dialog', { name: 'Site Navigation' });
+
+    // Distinct DOM element from mobileNavToggle (confirmed: setting a marker attribute
+    // on one is not visible on the other), despite sharing the same accessible name —
+    // this is the dialog's own "X" close button, separate from the header's hamburger
+    // toggle that opened it.
+    this.mobileNavCloseButton = this.mobileNavDialog.getByRole('button', { name: 'Close navigation', exact: true });
   }
 
   async goto(): Promise<void> {
@@ -59,5 +78,10 @@ export class HomePage {
   /** A link inside the footer landmark, scoped so it can't collide with a same-named header link. */
   footerLink(name: string): Locator {
     return this.footer.getByRole('link', { name, exact: true });
+  }
+
+  /** A dropdown toggle button inside the mobile nav dialog, e.g. "Services", "Company". */
+  mobileNavMenuButton(name: string): Locator {
+    return this.mobileNavDialog.getByRole('button', { name, exact: true });
   }
 }

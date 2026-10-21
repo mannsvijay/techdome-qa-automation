@@ -1,0 +1,8 @@
+Captured first-party response bodies: 54
+
+=== Secret pattern matches (count=0) ===
+
+=== Email addresses found (unique count=3) ===
+rahul.joshi@techdome.net.in | visible on: ["/","/contact"] | found in: ["https://techdome.io/","https://techdome.io/_next/static/chunks/4578-d895825fdd718d96.js","https://techdome.io/_next/static/chunks/4192-b249b4e2ccaf03ba.js","https://techdome.io/_next/static/chunks/app/layout-283c89eeed14470c.js","https://techdome.io/contact","https://techdome.io/_next/static/chunks/7254-61ace42ca916bc5f.js"] | occurrences: 20 (placeholder: 0)
+you@company.com | visible on: [] | found in: ["https://techdome.io/_next/static/chunks/app/layout-283c89eeed14470c.js"] | occurrences: 2 (placeholder: 2) | PLACEHOLDER (not asserted)
+name@company.com | visible on: [] | found in: ["https://techdome.io/_next/static/chunks/5255-3ebdc1b2a12348d3.js"] | occurrences: 1 (placeholder: 1) | PLACEHOLDER (not asserted)

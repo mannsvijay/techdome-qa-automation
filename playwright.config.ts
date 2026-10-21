@@ -39,6 +39,21 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: ['tests/load/**'],
+      use: { ...devices['Desktop Chrome'] },
+    },
+
+    /* Load tests (US-014): isolated in their own project so they only ever run after
+     * every other project has finished — never alongside them — per the hard rule of
+     * never exceeding 5 concurrent users. `dependencies: ['chromium']` enforces that
+     * ordering; by default, if the chromium project has any failing test, Playwright
+     * skips this project entirely rather than running load tests against a build that
+     * already failed functional checks. */
+    {
+      name: 'load',
+      testDir: './tests/load',
+      retries: 0,
+      dependencies: ['chromium'],
       use: { ...devices['Desktop Chrome'] },
     },
 

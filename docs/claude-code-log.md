@@ -238,8 +238,8 @@ Accepted the diagnosis of test d; the fix is to compare the request hostname, no
 
 
 
-// 14 
-Read CLAUDE.md, utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts and docs/evidence/contact-submit-inspection.txt. Do only this batch. You may edit or create only: utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts, tests/integration/contact-submission.spec.ts, tests/integration/third-party-scripts.spec.ts, tests/integration/http-status.spec.ts. Do not edit docs.
+## Prompt #14
+**What I asked:** Read CLAUDE.md, utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts and docs/evidence/contact-submit-inspection.txt. Do only this batch. You may edit or create only: utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts, tests/integration/contact-submission.spec.ts, tests/integration/third-party-scripts.spec.ts, tests/integration/http-status.spec.ts. Do not edit docs.
 
 SAFETY FIRST
 1. In utils/fixtures.ts, add a default route that aborts every request to "**/api/leads", with a comment: this guarantees no real lead is ever sent, even if a test forgets to mock it. Tests that need the endpoint register their own route afterwards, which takes precedence.
@@ -256,3 +256,130 @@ INTEGRATION (use test from utils/fixtures.ts)
 
 8. Run: npx playwright test tests/e2e/contact-form.spec.ts tests/integration --project=chromium --repeat-each=2 --retries=0
    Show the code, then the output. If anything fails, do not change assertions; explain whether evidence points to the site or the test.
+
+**What Claude did:** Added a default abort route for **/api/leads in the shared fixture, a ContactPage.fillFullLead() helper, the hostname fix for test d, an error-state test (mocked 500), and three integration specs: request payload for /api/leads (US-009), GTM delayed by 5s while the hero still renders within 3s (US-010), and HTTP status checks (/ and /contact return 200, a non-existent page returns 404). Before writing assertions it checked that a mocked 200 with "{}" shows the same error banner as a 500, and that GTM scripts are injected dynamically with async. Run: 14/18 passed. Two failures, both in its own locators: getByLabel(/^Company/) also matched the footer nav with aria-label "Company", and getByRole('alert') matched the empty Next.js route announcer instead of the error banner.
+
+**What I changed / accepted / rejected:**
+Accepted both diagnoses. The Company failure came from my own suggestion to use anchored regexes with getByLabel: I did not realise getByLabel also matches elements named by aria-label, like a nav landmark, so I switched inputs to getByRole('textbox'). For the alert, I questioned Claude's earlier pre-check: its "1 alert" was probably the route announcer, so it is still unknown whether the banner itself is announced to screen readers; I asked for that to be checked before fixing the test, since a missing role would be an accessibility bug. I did not treat "200 with {} shows the error banner" as a site bug: my mock probably did not match the response shape the site expects, so I asked Claude to read the site's JavaScript for the real success condition rather than guess. Positive findings recorded: no soft-404, and third-party scripts do not block the hero.
+
+
+
+## Prompt #15
+**What I asked:**  Read CLAUDE.md, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts and tests/integration/contact-submission.spec.ts. Do only this batch. You may edit only these three files and create only docs/evidence/contact-banner-role.txt. Do not edit other docs.
+
+PART A - Fix my locators
+1. ContactPage: use getByRole('textbox', { name: /^First name/ }) and the same pattern for Last name, Work email, Company and "What are you looking to build or staff?", so they cannot match landmarks like the footer nav "Company".
+2. Before fixing test e, check (scratch script, mocked 500 on /api/leads, the fixture's GA and /api/leads blocking in place): list every element with role alert or status after the failed submission, with its id, aria-live and text. Tell me whether the visible error banner itself has role alert/status, or whether only the Next.js route announcer does. Save the raw output to docs/evidence/contact-banner-role.txt.
+3. Fix test e based on that: if the banner has role alert, use getByRole('alert').filter({ hasText: "We couldn't submit" }). If it has no role, use a text locator scoped to the form with a comment explaining the exception, and tell me.
+
+PART B - How does the site decide success? (read-only, no request to /api/leads)
+4. Load /contact once and search the loaded first-party JavaScript for the code that handles the /api/leads response. Report the exact condition it uses to show success vs the error banner (for example res.ok plus a JSON field), quoting only the minimal relevant snippet. If you cannot find it, say "not found". Do not guess.
+5. Only if the condition was found: add a test to contact-submission.spec.ts that mocks a response matching that condition and asserts what the UI shows after success (inspect what appears first, then assert it).
+
+6. Run: npx playwright test tests/e2e/contact-form.spec.ts tests/integration --project=chromium --repeat-each=2 --retries=0
+   Show the output. If anything fails, do not change assertions; explain.
+
+
+
+**What Claude did:** Switched all ContactPage field locators to getByRole('textbox', { name: /^.../ }). Listed every role=alert/status element after a mocked 500 submission: the only alert was the empty Next.js route announcer; the visible error banner has no ARIA role or aria-live, and no form or landmark ancestor (saved to docs/evidence/contact-banner-role.txt). Fixed test e with a page-level text locator and a comment explaining the exception. Searched the site's loaded JavaScript and found the success condition: the response must be ok AND the JSON must have success: true; on success the form shows "Thank you, {first name}!" and opens a booking dialog. Added a mocked-success test asserting the "Thank you, QA!" heading. Run: 20/20 passed.
+
+**What I changed / accepted / rejected:**
+Questioning Claude's earlier "1 alert" pre-check turned a locator fix into a real accessibility finding: a failed submission is not announced to screen reader users. I logged it as a bug (Medium, because it is the failure path of the main lead form). Asking Claude to read the site's code instead of guessing a mock shape gave a verified success test, so valid submission is now covered without sending a real lead. From the result I noticed that "QA Test" was greeted as "Thank you, QA!", so the greeting keeps only the first word of the first name; logged as a Low candidate that may be intentional. I dropped my earlier bug idea that "Find a time" is a misleading label, because a booking dialog does open on success.
+  
+
+
+
+
+
+## Prompt #16
+**What I asked:** Read CLAUDE.md, utils/fixtures.ts, utils/helpers.ts, utils/pages/HomePage.ts and docs/user-story-map.md (US-002, US-005, US-006, US-007, US-008). Do only this batch. You may edit or create only: utils/pages/HomePage.ts, tests/e2e/mobile-responsiveness.spec.ts, tests/e2e/footer-navigation.spec.ts, tests/e2e/ctas-and-external-links.spec.ts, tests/e2e/performance.spec.ts, and screenshots named docs/evidence/mobile-*.png. Do not edit other docs. Use test from utils/fixtures.ts everywhere.
+
+RULE: first inspect the live site for each part and list what you observed, then write assertions only for what you observed. Never invent element names. If something looks broken (overflow, hidden nav, broken link), do not adjust the test to pass; keep the assertion, take a screenshot to docs/evidence/mobile-*.png where relevant, and report it.
+
+1. Mobile (US-007, US-008), test.use viewport 375x812 and 768x1024 in separate describes:
+   - homepage: no horizontal overflow (use assertNoHorizontalOverflow), hero heading visible
+   - header: report whether Services/Portfolio/Insights/Company are hidden and a menu toggle button appears; report its role and accessible name. Then assert: the toggle is visible, opening it shows the nav items, closing it hides them (only if that is what you observed)
+   - /contact: no horizontal overflow, First name field visible
+
+2. Footer (US-002): scoped to contentinfo. Assert each footer section/nav landmark you find is present with at least one link. Collect all unique internal footer hrefs and check each with the request fixture SEQUENTIALLY (no parallel requests), expecting status < 400. Report the list and count. Social icons: report each one's accessible name and href; assert each has a non-empty accessible name and an href to the expected domain. Never request third-party URLs.
+
+3. CTAs and external links (US-005, US-006, US-016): read hrefs only, do not navigate to any third-party site. Assert the header "Contact Us" link points to /contact. For every external link on the homepage, report text/name, href domain, target and rel; assert links with target="_blank" have rel containing "noopener". Report where any "Book call" link or button exists (any page section, any viewport); if none exists, say so.
+
+4. Performance: on the homepage, record Largest Contentful Paint with a PerformanceObserver, attach the value to the test report, and log it. Do not assert a threshold.
+
+5. Run: npx playwright test tests/e2e/mobile-responsiveness.spec.ts tests/e2e/footer-navigation.spec.ts tests/e2e/ctas-and-external-links.spec.ts tests/e2e/performance.spec.ts --project=chromium --repeat-each=2 --retries=0
+   Show the observations list first, then the code, then the output. If anything fails, do not change assertions; tell me the test, the error and whether evidence points to the site or the test.
+
+
+
+**What Claude did:** Inspected the live site before writing assertions. At 375x812 and 768x1024: no horizontal overflow on the homepage or /contact; header menu buttons are replaced by an "Open navigation" toggle that opens a full-screen "Site Navigation" dialog. Footer: four nav landmarks (Services 9, Industries 8, Products 8, Company 9 links); 39 unique internal hrefs checked sequentially; five named social links. All 15 external homepage links use target="_blank" with rel="noopener noreferrer" or are mailto/tel. "Book call" exists only at 375px, in the header, pointing to /contact. LCP was about 1.3–1.5s. Wrote four spec files and HomePage mobile locators. Run: 32/36; the "closing the menu hides the nav items" test failed at both widths because an SVG inside the mobile-nav dialog intercepted the click. Claude called this a site bug.
+
+**What I changed / accepted / rejected:**
+Did not accept the site-bug verdict. The error says the interceptor belongs to the dialog, and the inspection showed the dialog has its own "Close navigation" button; the test was clicking the header toggle, which the full-screen dialog covers. A real user taps the visible X inside the dialog, so I asked for the test to target that button and checked it manually at 375px [result]. Resolved the "Book call" question with evidence: it is the mobile label for the same /contact link that desktop shows as "Contact Us", never shown together, so I removed BUG-003 and kept it as an observation; my original note that both appear in the header was wrong. Recorded positive findings for the README: no mobile overflow, no broken footer links, noopener on all external links, LCP well under 2.5s.
+
+
+
+
+
+
+
+## Prompt #17
+**What I asked:**  Read CLAUDE.md, utils/fixtures.ts, utils/pages/HomePage.ts, utils/pages/ContactPage.ts and tests/e2e/mobile-responsiveness.spec.ts. Do only this batch. You may edit or create only: utils/pages/HomePage.ts, tests/e2e/mobile-responsiveness.spec.ts, tests/security/headers.spec.ts, tests/security/injection.spec.ts, tests/security/sensitive-data.spec.ts, and docs/evidence/security-*.txt. Do not edit other docs. Use test from utils/fixtures.ts.
+
+PART A - Mobile close test
+1. The interceptor in the failure is inside the mobile-nav dialog, and the dialog has its own "Close navigation" button. Check whether clicking the dialog's own button (scoped to the "Site Navigation" dialog) closes it at 375 and 768. Report the result. If it works, change only which button the test clicks and add a comment why; keep the "nav items hidden after close" assertion. If it also fails, do not work around it; report it.
+
+PART B - Security (inspect and report first, then assert; do not weaken assertions to make them pass)
+2. headers.spec.ts: with the request fixture, GET "/" and "/contact". Report all response headers to docs/evidence/security-headers.txt. Assert presence of Strict-Transport-Security, Content-Security-Policy, and either X-Frame-Options or a CSP frame-ancestors directive. Attach X-Content-Type-Options, Referrer-Policy and Permissions-Policy values to the report for information, without asserting them.
+3. injection.spec.ts: the /api/leads fixture abort stays in place. Test two payloads in First name, one at a time: <script>alert(1)</script> and <img src=x onerror=alert(1)>. Mock /api/leads with the site's real success shape ({ success: true, contactId, bookingToken }), fill the full lead, click "Find a time". Assert: no page dialog event fires, no injected <script> or <img> element with that content exists in the DOM, and the confirmation heading shows the payload as literal text if it appears. Capture the request body and report whether the client sends the raw payload or sanitises it. Add a comment that server-side sanitisation is out of scope because it would require sending real leads.
+4. sensitive-data.spec.ts: load "/" and "/contact" in the browser, collect the HTML and the bodies of all first-party responses (techdome.io, JSON and JS). Scan for: email addresses, AWS keys (AKIA...), Google API keys (AIza...), Stripe keys (sk_live_/pk_live_), GitHub tokens (ghp_), JWTs (eyJ... with two dots), private key headers (-----BEGIN), and "Bearer " tokens. Save all matches with source URL to docs/evidence/security-sensitive-scan.txt. Assert zero matches for the secret patterns. For emails: assert every email found also appears as a visible mailto link or visible text on the page; an email only present in source or network data must fail. Treat the GA (G-...) and GTM (GTM-...) IDs as public and do not flag them.
+
+5. Run: npx playwright test tests/e2e/mobile-responsiveness.spec.ts tests/security --project=chromium --repeat-each=2 --retries=0
+   Show the findings first, then the code, then the output. If anything fails, do not change assertions; tell me the test, the error, and whether evidence points to the site or the test.
+
+**What Claude did:** Confirmed the mobile-nav dialog has its own "Close navigation" button and that clicking it closes the dialog at 375px and 768px; switched the test to that button. Inspected security before asserting: HSTS, X-Frame-Options (SAMEORIGIN), X-Content-Type-Options, Referrer-Policy and Permissions-Policy are present on / and /contact, but Content-Security-Policy is missing on both. Neither injection payload executed or was injected into the DOM; the client sends the raw payload to /api/leads, and the "Thank you" heading showed "<img" because the site uses firstName.split(' ')[0]. Sensitive-data scan: zero secret-pattern matches across 54 first-party responses; one visible email; "you@company.com" found only in a JS bundle. Moved the evidence write before the assertions after noticing the headers file was not saved when the test failed. Run: 24/28; failures were the missing CSP and the you@company.com rule.
+
+**What I changed / accepted / rejected:**
+Accepted the dialog-button fix, but corrected Claude's code comment calling the header toggle "confirmed broken": it is simply covered by the full-screen dialog while open, which is normal modal behaviour, not a bug. Accepted missing CSP as a real finding (BUG-002, Medium: the site collects lead data and loads third-party scripts, though its other headers are good). The you@company.com failure was a gap in my own rule ("emails only in source must fail"), which did not consider placeholder text; I asked for that single address to be allowlisted only after confirming in the bundle that it is a placeholder, instead of loosening the rule. The injection result also confirmed BUG-005 (greeting uses only the first word of the first name) from the site's own code. Accepted the change to write evidence before asserting.
+
+
+
+
+
+
+
+## Prompt #18
+**What I asked:** Read CLAUDE.md, playwright.config.ts, utils/fixtures.ts, tests/security/headers.spec.ts and tests/security/sensitive-data.spec.ts. Do only this batch. You may edit or create only: playwright.config.ts, tests/security/headers.spec.ts, tests/security/sensitive-data.spec.ts, tests/load/load.spec.ts, docs/load-test-results.md. Do not edit other docs.
+
+PART A - Small fixes
+1. sensitive-data.spec.ts: first confirm in the JS bundle that "you@company.com" is used as an input placeholder (quote the minimal snippet). If confirmed, add an explicit allowlist containing only that address, with a comment explaining it is the newsletter input's placeholder text, not a leaked address. Do not loosen the rule for any other email. If not confirmed, leave the test unchanged and tell me.
+2. headers.spec.ts: mark the test with test.fail() and the annotation { type: 'bug', description: 'BUG-002: Content-Security-Policy missing on / and /contact' }. Keep all assertions and the report-before-assert order.
+
+PART B - Load test (US-014). Hard rule: never more than 5 concurrent users.
+3. playwright.config.ts: add a second project "load" that matches only tests/load/**, uses retries: 0, and has dependencies: ['chromium'], so it runs only after all other tests have finished and never alongside them. Make the chromium project ignore tests/load/**. Tell me what happens to the load project if a chromium test fails, and confirm the installed Playwright version supports this.
+4. tests/load/load.spec.ts: one test. const USERS = 5 with expect(USERS).toBeLessThanOrEqual(5) as the first line. Create exactly 5 request contexts (request.newContext with the baseURL) and run them with Promise.all. Each user does 3 rounds of GET "/" then GET "/contact", sequentially within that user (5 users x 2 pages x 3 rounds = 30 requests total). Record each request's duration in ms and status. Compute min, avg, p50, p95, max per page and overall, and the count of each status code.
+5. Write docs/load-test-results.md from the test BEFORE any assertion: date/time, users, rounds, total requests, a per-page and overall timing table, status counts, that this measures HTML document response time (not full page render or assets), and PASS/FAIL against p95 < 3000 ms and zero 5xx. Then assert p95 < 3000 and zero 5xx. Dispose all contexts.
+
+6. Run: npx playwright test tests/security --project=chromium --retries=0, then npx playwright test --project=load
+   Show the code, the config diff, the output, and the generated docs/load-test-results.md. If anything fails, do not change assertions; explain.
+
+**What Claude did:** Confirmed in the JS bundle that you@company.com is the placeholder of the newsletter input and allowlisted only that address. Marked the headers test with test.fail() and a BUG-002 annotation. Added a "load" project (tests/load only, retries 0, dependencies: ['chromium']) and made chromium ignore tests/load, on Playwright 1.64.1. Wrote the load test: 5 request contexts via Promise.all, each doing 3 rounds of GET / then GET /contact (30 requests), writing docs/load-test-results.md before asserting. The security run found a new placeholder, name@company.com (booking dialog guest field), in a chunk that had not loaded before, so the sensitive-data test failed. Running --project=load triggered the chromium project first; because of that failure the load test was skipped. Claude then ran it with --no-deps: 30/30 status 200, overall p95 899ms, PASS. A GTM-delay test was flaky (13.6s on the first attempt, passed on retry).
+
+**What I changed / accepted / rejected:**
+I reviewed load.spec.ts line by line for the hard limit: USERS is fixed at 5, exactly 5 contexts run in parallel, and each user's requests are sequential [confirm after reading]. I kept the dependency on the chromium project even though a functional failure skips the load test, because it guarantees the load test never runs alongside other tests and pushes concurrency above 5; I documented --no-deps for running it alone. The name@company.com failure showed that a per-address allowlist is fragile when chunks load non-deterministically, so I replaced it with a rule: emails used only as placeholder values are UI hints, not data, while every other email must still be visible. I rewrote the flaky third-party test to assert ordering (hero visible before any delayed GTM response is released) instead of a 3-second wall-clock limit that depends on my machine. Noted that 30 requests is a small sample for p95, chosen deliberately to respect the 5-user limit.
+
+
+
+
+
+// 19 
+Read CLAUDE.md, playwright.config.ts, tests/security/sensitive-data.spec.ts and tests/integration/third-party-scripts.spec.ts. Do only this batch. You may edit only these two spec files. Do not edit docs or any other file.
+
+1. sensitive-data.spec.ts: replace the per-address allowlist with a context rule. An email is skipped from the visibility assertion only if every occurrence in source is the value of a placeholder attribute (placeholder:"..." or placeholder="..."). Keep listing skipped emails in docs/evidence/security-sensitive-scan.txt marked "PLACEHOLDER (not asserted)". Any email that appears anywhere outside a placeholder must still be visible on the page or the test fails. Add a comment explaining the rule.
+
+2. third-party-scripts.spec.ts: remove the 3-second wall-clock assertion. Instead, delay every googletagmanager.com request by 5 seconds, record when the first delayed response is released, and assert that the hero heading is visible BEFORE any delayed GTM response has been released. Keep the async/defer note in the comment.
+
+3. Run the suite exactly as a reviewer would, with the default config: npx playwright test
+   Report: total tests per project, passed, failed, flaky, skipped, expected failures (test.fail) with their bug annotations, whether the load project ran, and total duration. If anything fails, do not change assertions; tell me the test, the error and whether evidence points to the site or the test.
+
+   
