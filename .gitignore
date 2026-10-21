@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Playwright output (regenerated on every run)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Claude Code local settings
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings (optional)
+.vscode/
+
+# Confidential assignment PDF — don't publish
+docs/QA-Playwright-Assignment.pdf
