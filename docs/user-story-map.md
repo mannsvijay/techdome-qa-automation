@@ -13,7 +13,7 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 | API / form integration | Integration | 3 | US-009, US-010, US-011 |
 | Security headers & injection | Security | 2 | US-012, US-013 |
 | Load (≤5 users) | Load | 1 | US-014 |
-| Extra (beyond minimum) | E2E | 3 | US-015, US-016, US-017 |
+| Extra (beyond minimum) | E2E | 4 | US-015, US-016, US-017, US-018 |
 
 ---
 
@@ -25,16 +25,17 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **I want to:** click the logo and each primary header item (Services, Portfolio, Insights, Company)
 
-**So that:** I can explore Techdome's site without hitting a 404 or a blank page
+**So that:** I can explore Techdome's site without hitting a 404, a blank page, or a header control that silently does nothing
 
 **Acceptance:**
-- [ ] Logo link navigates back to the homepage (`/`)
-- [ ] Services, Portfolio, Insights, and Company each open their menu/page without a 404 or blank page
-- [ ] Homepage browser tab title reads exactly "Techdome: Custom Software Development & Venture Studio"
-- [ ] No console errors are thrown while opening each header item
+- [x] Logo link navigates back to the homepage (`/`)
+- [x] Services, Portfolio, Insights, and Company are dropdown buttons (`role=button`, `aria-haspopup="true"`) that toggle a panel open and closed (`aria-expanded` `"true"`/`"false"`) — confirmed they do not navigate anywhere or produce a 404/blank page
+- [x] Homepage browser tab title reads exactly "Techdome: Custom Software Development & Venture Studio"
+- [ ] No console errors are thrown while opening each header item (console errors are collected and attached to the test report for visibility, but not asserted)
 
 **Test Type:** E2E
 **Priority:** P0
+**Automated in:** `tests/e2e/homepage.spec.ts`
 
 ---
 
@@ -49,14 +50,15 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** every path Techdome advertises in the footer actually leads somewhere valid
 
 **Acceptance:**
-- [ ] Footer Services links (`/studio`, `/studio#mvp`, `/staff-augmentation`, `/staff-augmentation#role-react-nextjs`, `/staff-augmentation#role-nodejs-backend`, `/automation`, `/gcc`, `/automation#ai-voice-agents`) each resolve without a 404
-- [ ] Footer Industries links (`/work?domain=...` for Healthcare, Enterprise & ERP, AI & Automation, FinTech, Consumer & Marketplace, Public Sector, EdTech & Education) each resolve without a 404
-- [ ] Footer Products links (`/products/sparrow`, justinterview-ai, saral-funding, geolytics, aether-voice, catalyst, arc) each resolve without a 404
-- [ ] Footer Company links (`/about`, `/work`, `/insights`, `/topics`, `/glossary`, `/newsletter`, `/life-at-techdome`, `/careers`, `/faq`) each resolve without a 404
-- [ ] `/privacy`, `/terms`, and `/sitemap.xml` each resolve without a 404
+- [x] Footer Services links (`/studio`, `/studio#mvp`, `/staff-augmentation`, `/staff-augmentation#role-react-nextjs`, `/staff-augmentation#role-nodejs-backend`, `/automation`, `/gcc`, `/automation#ai-voice-agents`) each resolve without a 404
+- [x] Footer Industries links (`/work?domain=...` for Healthcare, Enterprise & ERP, AI & Automation, FinTech, Consumer & Marketplace, Public Sector, EdTech & Education) each resolve without a 404
+- [x] Footer Products links (`/products/sparrow`, justinterview-ai, saral-funding, geolytics, aether-voice, catalyst, arc) each resolve without a 404
+- [x] Footer Company links (`/about`, `/work`, `/insights`, `/topics`, `/glossary`, `/newsletter`, `/life-at-techdome`, `/careers`, `/faq`) each resolve without a 404
+- [x] `/privacy`, `/terms`, and `/sitemap.xml` each resolve without a 404
 
 **Test Type:** E2E
 **Priority:** P1
+**Automated in:** `tests/e2e/footer-navigation.spec.ts`
 
 ---
 
@@ -71,13 +73,14 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** I get clear, immediate feedback instead of the form silently failing or losing my place
 
 **Acceptance:**
-- [ ] Clicking "Next" with First name empty shows a validation error for that field
-- [ ] Clicking "Next" with Work email empty shows a validation error for that field
-- [ ] Clicking "Next" with an invalid Work email (e.g. not containing `@`) shows a validation error
-- [ ] The form does not advance to the next step while any required field is invalid
+- [x] Clicking "Next" with First name empty shows a validation error for that field
+- [x] Clicking "Next" with Work email empty shows a validation error for that field
+- [x] Clicking "Next" with an invalid Work email (e.g. not containing `@`) shows a validation error
+- [x] The form does not advance to the next step while any required field is invalid
 
 **Test Type:** E2E
 **Priority:** P0
+**Automated in:** `tests/e2e/contact-form.spec.ts`
 
 ---
 
@@ -92,12 +95,13 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** I can proceed toward booking a scoping call, while my test run never sends a real enquiry to Techdome
 
 **Acceptance:**
-- [ ] With First name and Work email filled in, clicking "Next" advances the form past step 1 (or shows the expected next-step UI)
-- [ ] The underlying network request is intercepted via `page.route()` per CLAUDE.md — no request reaches the live `techdome.io` contact endpoint
-- [ ] The "Existing client" (`/contact?for=client`) and "Student or learner" (`/contact?for=student`) links each load the contact page with the expected query parameter
+- [x] With First name and Work email filled in, clicking "Next" advances the form to step 2, revealing the "What do you need?" select
+- [x] No network request (GET or otherwise) is sent to techdome.io during the step 1 → step 2 transition — it is confirmed to be purely client-side
+- [ ] The "Existing client" (`/contact?for=client`) and "Student or learner" (`/contact?for=student`) links each load the contact page with the expected query parameter (not exercised by any test)
 
 **Test Type:** E2E
 **Priority:** P0
+**Automated in:** `tests/e2e/contact-form.spec.ts`
 
 ---
 
@@ -124,6 +128,7 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **Test Type:** E2E
 **Priority:** P0
+**Not automated:** `tests/e2e/ctas-and-external-links.spec.ts` checks the header "Contact Us" link and the generic external-link `target`/`rel` rule, but no test asserts any of these specific internal CTA hrefs.
 
 ---
 
@@ -146,6 +151,7 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **Test Type:** E2E
 **Priority:** P1
+**Automated in:** `tests/e2e/ctas-and-external-links.spec.ts` — but only as a blanket rule across all 15 external links found (every `target="_blank"` link must have `rel` containing `noopener`); none of the five specific domains/destinations above is individually asserted.
 
 ---
 
@@ -160,12 +166,14 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** I can read the content and reach navigation without pinch-zooming or scrolling sideways
 
 **Acceptance:**
-- [ ] No horizontal overflow/scroll is present at 375px
-- [ ] Header navigation collapses into a usable mobile control (and nav items remain reachable) at 375px
-- [ ] Hero heading and hero stats remain visible and legible (no cut-off text) at 375px
+- [x] No horizontal overflow/scroll is present at 375px
+- [x] Header navigation collapses behind a single "Open navigation" toggle button (`aria-controls="mobile-nav"`), which opens a full-screen `role="dialog"` ("Site Navigation") containing its own Services/Portfolio/Insights/Company buttons — confirmed to open and close correctly at 375px
+- [x] Hero heading remains visible at 375px
+- [ ] Hero stats (7+/40+/100%) remain visible and legible at 375px (visibility of the heading is asserted; the stats specifically are not)
 
 **Test Type:** E2E
 **Priority:** P1
+**Automated in:** `tests/e2e/mobile-responsiveness.spec.ts`
 
 ---
 
@@ -180,32 +188,35 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** the layout reflows correctly between mobile and desktop breakpoints
 
 **Acceptance:**
-- [ ] No horizontal overflow/scroll is present at 768px
-- [ ] Header navigation renders correctly (collapsed or expanded, consistently) at 768px
-- [ ] Hero section and CTA buttons remain visible and usable without overlap at 768px
+- [x] No horizontal overflow/scroll is present at 768px
+- [x] Header navigation renders the same "Open navigation" toggle / "Site Navigation" dialog pattern as 375px, confirmed to open and close correctly at 768px too
+- [ ] Hero section and CTA buttons remain visible and usable without overlap at 768px (only the hero heading's visibility is asserted)
 
 **Test Type:** E2E
 **Priority:** P2
+**Automated in:** `tests/e2e/mobile-responsiveness.spec.ts`
 
 ---
 
 ## US-009
 
-**Title:** Contact form submission sends the expected request payload, intercepted
+**Title:** Contact form submission sends the expected request payload to `/api/leads`
 
 **As a:** prospect
 
-**I want to:** submit the contact form's first step
+**I want to:** complete both steps of the contact form and submit
 
-**So that:** I can trust the right data is being sent, without a real enquiry reaching Techdome during testing
+**So that:** I can trust the right data reaches the backend, without a real enquiry ever reaching Techdome during testing
 
 **Acceptance:**
-- [ ] Clicking "Next" with valid data triggers exactly one intercepted network request (via `page.route()`)
-- [ ] The intercepted request's payload contains the First name and Work email values entered
-- [ ] No request to the live `techdome.io` contact endpoint is ever allowed through during the test
+- [x] Clicking "Next" after step 1 (First name/Work email) triggers no network request — the step 1 → step 2 transition is entirely client-side
+- [x] The final "Find a time" click sends exactly one `POST` request to `/api/leads` with `Content-Type: application/json`
+- [x] The request body contains `service`, `contact.{firstName,lastName,email,company}`, `answers.{requirement,teamSize,timeline,budget}`, `utm`, `attribution`, `landingPage`, and `website`, matching the values entered
+- [x] No real request ever reaches the live `/api/leads` endpoint during any test — it is always mocked
 
 **Test Type:** Integration
 **Priority:** P0
+**Automated in:** `tests/integration/contact-submission.spec.ts`
 
 ---
 
@@ -217,15 +228,16 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **I want to:** load the homepage
 
-**So that:** third-party resources (fonts, analytics, or other third-party scripts observed on the page) don't delay the content I came for
+**So that:** third-party resources (Google Tag Manager/gtag) don't delay the content I came for
 
 **Acceptance:**
-- [ ] Any third-party script requests observed on the homepage are recorded (host + resource type)
-- [ ] None of the observed third-party requests appear in the render-blocking path before the hero content paints
-- [ ] Page finishes rendering hero content even if a third-party request is slow or fails
+- [x] The gtm.js/gtag.js `<script>` tags are loaded with `async: true` and no `defer` attribute — consistent with non-blocking loading
+- [x] When every `googletagmanager.com` request is deliberately delayed by 5 seconds, the hero heading still becomes visible strictly before the first delayed GTM response is released back to the page
+- [ ] Page finishes rendering hero content even if a third-party request fails outright (only a slow/delayed request was tested, not an aborted or failed one)
 
 **Test Type:** Integration
 **Priority:** P1
+**Automated in:** `tests/integration/third-party-scripts.spec.ts`
 
 ---
 
@@ -246,6 +258,7 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **Test Type:** Integration
 **Priority:** P2
+**Not automated:** every spec file other than `tests/e2e/newsletter-popup.spec.ts` suppresses the newsletter pop-up via `utils/fixtures.ts`, and that one file only tests the dropdown-collapse bug (BUG-001) and close/suppression persistence — no test fills or submits the "Subscribe" form itself.
 
 ---
 
@@ -260,12 +273,13 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** I can trust Techdome is following baseline web security practices before I submit any information
 
 **Acceptance:**
-- [ ] Response headers for `/` are checked for `X-Frame-Options`, `Content-Security-Policy`, and `Strict-Transport-Security`
-- [ ] Response headers for `/contact` are checked for the same three headers
-- [ ] Any of the three headers found missing on either page is recorded as a finding in `docs/bugs.md`
+- [x] Response headers for `/` are checked for `X-Frame-Options`, `Content-Security-Policy`, and `Strict-Transport-Security`
+- [x] Response headers for `/contact` are checked for the same three headers
+- [ ] Any of the three headers found missing on either page is recorded as a finding in `docs/bugs.md` (done manually as BUG-002; not something the test itself asserts)
 
 **Test Type:** Security
 **Priority:** P0
+**Automated in:** `tests/security/headers.spec.ts` (marked `test.fail()` — `Content-Security-Policy` is confirmed missing on both pages; see BUG-002)
 
 ---
 
@@ -280,12 +294,13 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** a malicious input can't execute in my browser or get stored/reflected unescaped
 
 **Acceptance:**
-- [ ] Submitting the script payload in First name does not trigger a JS alert or execute in the DOM
-- [ ] The intercepted request payload is inspected to confirm the raw `<script>` string is not reflected unescaped anywhere on the resulting page
-- [ ] No request reaches the live backend (per CLAUDE.md, submission is intercepted via `page.route()`)
+- [x] Submitting the script payload in First name does not trigger a JS alert or execute in the DOM
+- [x] The intercepted request payload is inspected to confirm the raw `<script>` string is not reflected unescaped anywhere on the resulting page
+- [x] No request reaches the live backend (per CLAUDE.md, submission is intercepted via `page.route()`)
 
 **Test Type:** Security
 **Priority:** P0
+**Automated in:** `tests/security/injection.spec.ts` (also covers a second payload, `<img src=x onerror=alert(1)>`, beyond the minimum)
 
 ---
 
@@ -300,13 +315,14 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** the site stays responsive and error-free under light concurrent load
 
 **Acceptance:**
-- [ ] Exactly 5 concurrent virtual users hit `/` and `/contact` simultaneously — never more, per CLAUDE.md's hard limit
-- [ ] p95 response time across the run is under 3,000 ms
-- [ ] Zero HTTP 5xx responses occur during the run
-- [ ] Results are captured and saved to `docs/load-test-results.md`
+- [x] Exactly 5 concurrent virtual users hit `/` and `/contact` simultaneously — never more, per CLAUDE.md's hard limit
+- [x] p95 response time across the run is under 3,000 ms
+- [x] Zero HTTP 5xx responses occur during the run
+- [x] Results are captured and saved to `docs/load-test-results.md`
 
 **Test Type:** Load
 **Priority:** P0
+**Automated in:** `tests/load/load.spec.ts` (runs in its own Playwright project, dependent on `chromium`, so it never runs concurrently with any other test)
 
 ---
 
@@ -327,6 +343,7 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **Test Type:** E2E
 **Priority:** P2
+**Not automated:** investigated via a one-off script, with results saved to `docs/evidence/bug-006-title-mismatch.txt` and logged as BUG-006 in `docs/bugs.md`; no automated test asserts this.
 
 ---
 
@@ -341,12 +358,13 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 **So that:** I don't get confused by two differently-labelled buttons that may or may not lead to the same place
 
 **Acceptance:**
-- [ ] "Book call" navigates to `/contact`
-- [ ] "Contact Us" navigates to `/contact`
-- [ ] Both buttons land on an identical page state (no difference in query params or pre-filled fields between the two)
+- [x] "Book call" navigates to `/contact` (confirmed as the header's CTA label at the 375px viewport)
+- [x] "Contact Us" navigates to `/contact` (confirmed as the header's CTA label at 768px and wider — the two labels are never shown together, they're the same link at different breakpoints)
+- [ ] Both buttons land on an identical page state (no difference in query params or pre-filled fields between the two) — not separately tested
 
 **Test Type:** E2E
 **Priority:** P2
+**Automated in:** `tests/e2e/ctas-and-external-links.spec.ts`
 
 ---
 
@@ -367,3 +385,24 @@ Source: `docs/exploration-notes.md` only. No pages, buttons, or behaviours beyon
 
 **Test Type:** E2E
 **Priority:** P2
+**Not automated:** no test file navigates to or asserts scroll position for any of these anchors.
+
+---
+
+## US-018
+
+**Title:** Newsletter pop-up does not collapse an already-open header dropdown
+
+**As a:** visitor
+
+**I want to:** have a header dropdown I've already opened stay open
+
+**So that:** an unrelated, automatically-appearing newsletter pop-up doesn't interrupt the menu I'm actively using
+
+**Acceptance:**
+- [ ] Opening a header dropdown (e.g. Services) and leaving it open while the newsletter pop-up appears (2–3s after load) does not collapse the dropdown — `aria-expanded` stays `"true"`
+- [ ] Closing the newsletter pop-up persists suppression via the `td_nl_popup_until` localStorage key, set roughly 14 days into the future, so it does not reappear on reload or on `/contact` within that window
+
+**Test Type:** E2E
+**Priority:** P2
+**Automated in:** `tests/e2e/newsletter-popup.spec.ts` — the first acceptance item is actively asserted but currently fails (`test.fail()`, annotation BUG-001): the dropdown does *not* stay open, confirming this story is not yet met. The second item's suppression-persistence behaviour is confirmed working.
