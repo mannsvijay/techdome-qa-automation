@@ -15,12 +15,24 @@ test.describe('US-018: Newsletter pop-up vs header dropdown', () => {
     testInfo.annotations.push({ type: 'bug', description: 'BUG-001' });
     test.fail();
 
-    await page.goto('/');
-
     const servicesButton = page.getByRole('banner').getByRole('button', { name: 'Services', exact: true });
     const dialog = page.getByRole('dialog', { name: DIALOG_NAME });
 
-    await servicesButton.click();
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await servicesButton.waitFor({ state: 'visible' });
+
+    // page.clock does not control this pop-up (confirmed by investigation: waiting with
+    // the clock installed but not advanced still let it appear), so there's no way to hold
+    // it off deterministically. If it's already up before we can click, the click itself
+    // would just hang on its backdrop for the rest of the test instead of exercising the
+    // race this test documents — skip that run rather than timing out.
+    if (await dialog.isVisible()) {
+      test.skip(true, 'Precondition not met: pop-up appeared before the menu could be opened');
+    }
+
+    // A race window still remains between the check above and the click below — the
+    // pop-up can appear in that gap too, which is itself part of what BUG-001 covers.
+    await servicesButton.click({ timeout: 3000 });
     await expect(servicesButton).toHaveAttribute('aria-expanded', 'true');
 
     await dialog.waitFor({ state: 'visible' });

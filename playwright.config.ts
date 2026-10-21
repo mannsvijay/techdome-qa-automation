@@ -20,7 +20,7 @@ export default defineConfig({
   /* Retry once locally to absorb a flaky network hiccup against the live site; twice on CI. */
   retries: process.env.CI ? 2 : 1,
   /* Limit workers — hard rule: never more than 5 concurrent users/workers (see CLAUDE.md). */
-  workers: 4,
+  workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

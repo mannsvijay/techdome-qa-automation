@@ -116,3 +116,45 @@ This experiment separated the two explanations I had for the dropdown failures. 
 
 **What I changed / accepted / rejected:**
 Accepted the fixture approach, which uses the site's own dismissal key so the pop-up never appears in unrelated tests. Rejected the explanation for the BUG-001 test: it failed on its precondition (the pop-up appeared before the Services click, because goto resolved after ~2s under load), so it never tested the collapse behaviour. A timeout is also not an expected failure for test.fail(), which is why these runs counted as failures. A test.fail() test that can fail for any reason would also hide a future fix, so I am making its timing deterministic with page.clock instead of accepting it. Did not accept the CPU-starvation explanation without a --workers=1 comparison. [If you reviewed it: I also decided to replace the count-of-all-links assertion in the dropdown tests with a specific panel link check, because count() was slow in the traces and only proves "something changed".]
+
+
+
+
+
+## Prompt #9
+**What I asked:**              
+  PART A - Can page.clock control the newsletter pop-up?                                                                                                        
+  In a scratch script outside the repo, fresh context, no localStorage seeding:                                                                                 
+  1. Call page.clock.install() before page.goto('/'). After load, wait 6 seconds of real time and record whether the newsletter dialog ("One engineering note,  
+  every other Monday.") becomes visible.                                                                                                                        
+  2. Then call page.clock.runFor(10000) and record whether the dialog becomes visible within 2 seconds of real time.                                            
+  3. Fresh context again: install the clock, go to '/', click the "Services" header button, record aria-expanded, then runFor(10000), wait for the dialog, and  
+  record aria-expanded at that moment.                                                                                                                          
+     Report raw results only. If a step cannot run, write "not run" with the reason. Delete the scratch script.                                                 
+                                                                                                                                                                
+  PART B - Is the dropdown timeout caused by parallel load?                                                                                                     
+  Run: npx playwright test tests/e2e/homepage.spec.ts --project=chromium --repeat-each=3 --retries=0 --workers=1                                                
+  Report pass/fail counts, total duration, and the slowest click duration from any trace if a test fails. Do not change anything based on the result
+
+**What Claude did:** Tested whether page.clock could control the newsletter pop-up: with the clock installed and not advanced, the pop-up still appeared within 6s of real time, so the clock does not control it. In a separate run, Services opened ("true") and switched to "false" when the pop-up appeared, reproducing BUG-001 again. Ran homepage.spec.ts with --workers=1 --repeat-each=3 --retries=0: 21/21 passed in 1.3 minutes, compared with 3 timeouts at 4 workers.
+
+**What I changed / accepted / rejected:**
+My page.clock idea did not work, so I dropped it instead of forcing it, and chose a precondition guard: the BUG-001 test now skips with a reason if the pop-up is already open before the menu click, so test.fail() can only be satisfied by the real collapse behaviour, not by a blocked click. I accepted the single-worker result as a signal that parallel load caused the dropdown timeouts and reduced local workers from 4 to 2 (1 on CI), trading some speed for stability and lower load on techdome.io. I did not increase timeouts, because that would hide the slowness rather than remove it. BUG-001 has now reproduced 3/3 in automation.
+Do not edit any test, page object, config or docs file in this batch. Diagnosis only, then wait for my approval.                                              
+                                                                                                                                                
+
+
+Read CLAUDE.md, playwright.config.ts, tests/e2e/homepage.spec.ts and tests/e2e/newsletter-popup.spec.ts. Do only this batch. You may edit only these three files: playwright.config.ts, tests/e2e/homepage.spec.ts, tests/e2e/newsletter-popup.spec.ts. Do not edit docs.
+
+1. playwright.config.ts: set workers to process.env.CI ? 1 : 2. Change nothing else.
+
+2. newsletter-popup.spec.ts, BUG-001 test: page.clock does not control this pop-up, so do not use it. Instead:
+   - goto '/' with waitUntil 'domcontentloaded' and wait for the "Services" button to be visible
+   - if the newsletter dialog is already visible at that point, call test.skip(true, 'Precondition not met: pop-up appeared before the menu could be opened')
+   - click "Services" with { timeout: 3000 }, expect aria-expanded "true", wait for the dialog, then expect aria-expanded still "true"
+   - keep test.fail() and the BUG-001 annotation, add a short comment explaining the skip guard and the remaining race window. No try/catch.
+
+3. homepage.spec.ts dropdown tests: first inspect each of the four panels (Services, Portfolio, Insights, Company) and tell me the accessible names of the links inside each open panel. Then replace the count-based assertion with: after opening, expect one specific link that appears only in that panel to be visible (scoped to the banner); after closing, expect it hidden. Keep the aria-expanded assertions. Show me the old and new assertion side by side.
+
+4. Run: npx playwright test tests/e2e --project=chromium --repeat-each=3 --retries=0
+   Show the output. If anything fails, do not change assertions; tell me the test, the error, and whether evidence points to the site or the test.                                                                                                                                            
