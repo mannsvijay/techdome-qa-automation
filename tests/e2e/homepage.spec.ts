@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
+import { test, expect } from '../../utils/fixtures';
 import { HomePage } from '../../utils/pages/HomePage';
 import { collectConsoleErrors, ConsoleErrorEntry } from '../../utils/helpers';
 

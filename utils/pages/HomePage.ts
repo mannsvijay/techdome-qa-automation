@@ -33,10 +33,17 @@ export class HomePage {
   }
 
   async goto(): Promise<void> {
-    // The newsletter pop-up appears a few seconds after load with a full-viewport
-    // backdrop that intercepts pointer events on the header until dismissed. Registering
-    // a locator handler means Playwright closes it automatically whenever it becomes
-    // visible, right before any action/assertion that would otherwise wait on it.
+    // Two layers of defense against the newsletter pop-up, kept together deliberately:
+    //
+    // 1. Primary: utils/fixtures.ts seeds localStorage("td_nl_popup_until") via an init
+    //    script before navigation, using the same key the site itself writes when a
+    //    visitor closes the pop-up (confirmed in docs/evidence/bug-001-investigation.txt).
+    //    For any test using that fixture's `test`, the pop-up never appears at all.
+    // 2. Fallback: this locator handler stays registered regardless of which `test` import
+    //    a caller uses, so if the pop-up does appear anyway — e.g. in
+    //    tests/e2e/newsletter-popup.spec.ts, which deliberately uses the plain
+    //    @playwright/test to exercise the pop-up itself — it still gets closed
+    //    automatically instead of blocking every subsequent action.
     await this.page.addLocatorHandler(this.newsletterDialog, async () => {
       await this.newsletterCloseButton.click();
     });

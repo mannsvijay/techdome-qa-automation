@@ -94,3 +94,25 @@ Delete the scratch script, then stop.
 
 **What I changed / accepted / rejected:**
 This experiment separated the two explanations I had for the dropdown failures. My own hypothesis (the locator handler's close click acting as an outside click) was wrong: the pop-up collapses the open menu as soon as it appears, so this is a real site bug and I rewrote BUG-001 with these steps. Claude's original "site bug" label was partly right, but it had no evidence at the time and also blamed failure shape 1, which did not reproduce in sequential runs. I worked out that td_nl_popup_until is set 14 days ahead, so dismissal is remembered; I lowered BUG-001 to Medium because only first visits are affected, and used this key to suppress the pop-up in tests instead of racing it. [B1 decision: BUG-003 corrected with location X / removed because "Book call" could not be found.]
+
+
+
+## Prompt #8
+**What I asked:** Read CLAUDE.md, utils/pages/HomePage.ts, tests/e2e/homepage.spec.ts and docs/evidence/bug-001-investigation.txt. Do only this batch. Do not edit any docs file.
+
+  1. In utils/fixtures.ts, export a test (extending @playwright/test) whose page fixture adds an init script that sets localStorage "td_nl_popup_until" to a timestamp 1 day in the
+  future, only when the page origin is techdome.io. This prevents the newsletter pop-up in tests that are not about it. Keep the addLocatorHandler in HomePage as a fallback, with a
+  comment explaining why both exist.
+  2. Update tests/e2e/homepage.spec.ts to import test and expect from utils/fixtures.ts. Do not change any assertion.
+  3. Create tests/e2e/newsletter-popup.spec.ts using the plain @playwright/test (no suppression), covering US-018:
+     a. Open the homepage, click "Services", expect aria-expanded "true", wait for the newsletter dialog to be visible, then expect "Services" aria-expanded to still be "true".
+  Mark this test with test.fail() and an annotation { type: 'bug', description: 'BUG-001' }, because it documents a known site bug.
+     b. Close the dialog with "Close newsletter pop-up", expect localStorage "td_nl_popup_until" to be set, reload, wait 6 seconds, expect the dialog not to be visible.
+     Use role-based locators only, dialog name "One engineering note, every other Monday."
+  4. Run: npx playwright test tests/e2e --project=chromium --repeat-each=3 --retries=0
+     Show me the code, then the output. If anything fails, do not change assertions; tell me which test, the error, and whether the evidence points to the site or the test. 
+
+**What Claude did:** Created utils/fixtures.ts with a page fixture that seeds localStorage td_nl_popup_until one day ahead via an init script (techdome.io only), kept the addLocatorHandler in HomePage as a documented fallback, switched homepage.spec.ts to the fixture without touching assertions, and wrote tests/e2e/newsletter-popup.spec.ts with two US-018 tests: a test.fail() test for BUG-001 and a persistence-after-reload test. Ran tests/e2e with --repeat-each=3 --retries=0: 27 tests, 21 passed, 6 failed. The BUG-001 test timed out 3/3 on its first click because the pop-up backdrop was already intercepting pointer events; Claude called this the documented bug "behaving as intended". Portfolio, Insights and Company each timed out once with clicks taking 6.5–13.6s; Claude attributed this to 4 parallel workers starving CPU.
+
+**What I changed / accepted / rejected:**
+Accepted the fixture approach, which uses the site's own dismissal key so the pop-up never appears in unrelated tests. Rejected the explanation for the BUG-001 test: it failed on its precondition (the pop-up appeared before the Services click, because goto resolved after ~2s under load), so it never tested the collapse behaviour. A timeout is also not an expected failure for test.fail(), which is why these runs counted as failures. A test.fail() test that can fail for any reason would also hide a future fix, so I am making its timing deterministic with page.clock instead of accepting it. Did not accept the CPU-starvation explanation without a --workers=1 comparison. [If you reviewed it: I also decided to replace the count-of-all-links assertion in the dropdown tests with a specific panel link check, because count() was slow in the traces and only proves "something changed".]
