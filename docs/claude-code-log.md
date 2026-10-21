@@ -59,3 +59,19 @@ PART B - Contact form follow-up (read-only, same rules: abort every non-GET requ
 **What I changed / accepted / rejected:**
 Accepted Claude's correction of the dialog name; my name came from the visible label, which is not the ARIA name, and would have matched zero elements. Rejected the "site bug" verdict for now: Claude called the failures unpredictable, but its own timings are consistent (~2.2s), and the old dismissal waited for the popup before interacting while the new handler does not. My hypothesis is that the handler's click on the close button acts as an outside click that closes the open dropdown, so the flakiness may be caused by my own change. I asked for trace evidence before logging anything in bugs.md. Also did not accept two unverified claims: that the extra "Enter your work email" input belongs to a chat widget, and the aria-invalid result after a valid email (no blur was done). Corrected BUG-001: the timing is consistent, not random. 
 
+
+
+## Prompt #6
+**What I asked:** Do not edit any file. Do not rerun tests, reload pages, or repeat browser interactions to fill gaps. Inspect existing traces, logs, screenshots, and available scratch-script output. Report only raw findings from steps actually performed. If a step was not run or evidence is unavailable, report "not run" or "not recorded". Do not infer missing results or state root-cause conclusions.
+
+Part A — Newsletter dialog and header dropdowns: Report trace timelines for both failure shapes; whether Services aria-expanded became "false" after closing the dialog while the menu was open in both attempts; any cookie or storage keys added or changed; and whether the dialog reappeared after reload.
+
+Part B — Contact form: Report visible error text after empty Next; Work email aria-invalid after blur; the closest dialog or landmark ancestor of the separate "Enter your work email" input; all "What do you need?" options; what appeared after Find a time, including fields and iframe domains; and every recorded network request with method, URL, and whether it was allowed or aborted.
+
+Do not modify files, create tests, change assertions, or make recommendations. Return only findings under Part A and Part B. 
+
+**What Claude did:** Read the existing Playwright traces and earlier script output without re-running anything. Shape 1: the baseline check failed before any click, aria-expanded was "" (empty) for about 5s after navigation. Shape 2: the test clicked Services, the locator handler closed the dialog about 400ms later, and every recorded value after that was "false"; no "true" was ever recorded. Marked storage, reload, visible error text, blur, ancestor, combobox options and "Find a time" as not run or not recorded. Listed the only logged requests: two aborted GA collect beacons and three GTM GETs; first-party GETs were never logged.
+
+**What I changed / accepted / rejected:**
+I wrote this prompt myself on top of the suggested one, adding rules not to re-run anything and to write "not run" instead of inferring. Accepted the findings as the real state of evidence. They rule out my earlier hypothesis for shape 1 (the handler did not cause it, since there was no click), and leave two explanations for shape 2: the handler's close click acting as an outside click (test-induced) or the dialog closing the menu when it opens (a real site issue). I designed the next experiment to separate these two instead of picking one, and asked for raw output to be saved in docs/evidence/ so the bug report has verifiable evidence.
+
