@@ -416,3 +416,4 @@ I asked for the postinstall script because the assignment says the reviewer will
 
 **What I changed / accepted / rejected:**
 The fresh-clone run proves the reviewer's single command works, which was the main goal. I removed the stray screenshots myself; they came from a path mistake in a Claude script that I had committed without checking the file list, so I now review git status before each commit. I changed the CI workflow to manual trigger only and Chromium only: running the full suite and load test against Techdome's production site on every push was unnecessary load, even within the 5-user limit, and I had not noticed my earlier pushes were triggering it. [Type-check: added tsconfig and typecheck script and fixed N errors / skipped and documented in README because Playwright compiles TypeScript without type-checking and time was limited.]
+

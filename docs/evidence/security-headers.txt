@@ -1,11 +1,11 @@
 === / (status 200) ===
-date: Wed, 21 Oct 2026 22:30:05 GMT
+date: Wed, 21 Oct 2026 23:07:12 GMT
 content-type: text/html; charset=utf-8
 transfer-encoding: chunked
 connection: keep-alive
 cache-control: s-maxage=60, stale-while-revalidate=31535940
 nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
-report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=nCStEJJdsVKzR5ZebNll8QarlH4WlameVuXJ%2BXMQtqNuG%2F8xin2jblUqywWJTVv5v%2Ba9O3wGzZs1CoBTl6qFJmK%2BRdGccTI5eMV3an3XBSJ5mdfENo%2BUBCoZTcz45LA6w0gMwNKpd0zhkg%3D%3D"}]}
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=1COUCnFXU54cx%2BElBIHsSAfSt1OPg2sJ0aS5LaPEJ3pFEarPs1e%2FFnw9xdHFulag%2FpNra5HBrNUsLvC5F6pew5QJM3wKuLRFGr9lOD9WZziVnL3Uq18r3Zn0Ds0lozzkd%2BQZbYzNYueRTQ%3D%3D"}]}
 permissions-policy: camera=(), microphone=(), geolocation=()
 referrer-policy: strict-origin-when-cross-origin
 server: cloudflare
@@ -17,21 +17,21 @@ x-frame-options: SAMEORIGIN
 x-nextjs-cache: HIT
 x-nextjs-prerender: 1
 x-nextjs-stale-time: 300
-x-railway-request-id: tDPwauGHQ2u6lHzm-_9nXA
+x-railway-request-id: CILYqdYvRAew_Wk8ljLL4A
 x-railway-edge: sin1
-x-hikari-trace: sin1.462z
+x-hikari-trace: sin1.hs0s
 cf-cache-status: DYNAMIC
 content-encoding: br
-cf-ray: a4e3b46ace80cde2-SIN
+cf-ray: a4e3eaccb842fd69-SIN
 alt-svc: h3=":443"; ma=86400
 
 === /contact (status 200) ===
-date: Wed, 21 Oct 2026 22:30:06 GMT
+date: Wed, 21 Oct 2026 23:07:14 GMT
 content-type: text/html; charset=utf-8
 transfer-encoding: chunked
 connection: keep-alive
 cache-control: private, no-cache, no-store, max-age=0, must-revalidate
-report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=u3WFsKiiRvUeaIWa%2FrMk3%2BubKx447RYwIiF7QYyGFgX%2F3Fj53itrvlERiLyXBGec5RkKr3FxvOHM2aPNdPoepViZiRlc3oPfQaNEzsnQP2jtDx4yeNE%2B6ctu4fFRpppy2oMkjWQTFGSdtg%3D%3D"}]}
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=%2FipHWWEq4N0oCgltBfOeq2bNfjoyGgfv5Gbqg%2BTAVJNjHJARAO51xrSBZdUud8Necbnbi%2BIbO2Qk5Drhwm7Zcqrh6o3hSFJdnuCwcy%2Bz2vvKK0nEvhpyRQxyrMa5E8f8HALD%2BT%2FF3GPQnQ%3D%3D"}]}
 link: </_next/static/media/13971731025ec697-s.p.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/e4af272ccee01ff0-s.p.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/css/72d8782a779ea196.css>; rel=preload; as="style", </_next/static/css/60425751bb2520bf.css>; rel=preload; as="style"
 permissions-policy: camera=(), microphone=(), geolocation=()
 referrer-policy: strict-origin-when-cross-origin
@@ -41,12 +41,12 @@ vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-pre
 x-content-type-options: nosniff
 x-dns-prefetch-control: on
 x-frame-options: SAMEORIGIN
-x-railway-request-id: iMi2Imv4R1i0tlju6WHkDg
+x-railway-request-id: OgKV87YURUWy1lAN2prcFg
 x-railway-edge: sin1
-x-hikari-trace: sin1.462z
+x-hikari-trace: sin1.hs0s
 cf-cache-status: DYNAMIC
 nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
 content-encoding: br
-cf-ray: a4e3b46dcb9acde2-SIN
+cf-ray: a4e3ead20c83fd69-SIN
 alt-svc: h3=":443"; ma=86400
 
