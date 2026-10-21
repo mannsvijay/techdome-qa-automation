@@ -143,8 +143,8 @@ My page.clock idea did not work, so I dropped it instead of forcing it, and chos
 Do not edit any test, page object, config or docs file in this batch. Diagnosis only, then wait for my approval.                                              
                                                                                                                                                 
 
-
-Read CLAUDE.md, playwright.config.ts, tests/e2e/homepage.spec.ts and tests/e2e/newsletter-popup.spec.ts. Do only this batch. You may edit only these three files: playwright.config.ts, tests/e2e/homepage.spec.ts, tests/e2e/newsletter-popup.spec.ts. Do not edit docs.
+## Prompt #10
+**What I asked:** Read CLAUDE.md, playwright.config.ts, tests/e2e/homepage.spec.ts and tests/e2e/newsletter-popup.spec.ts. Do only this batch. You may edit only these three files: playwright.config.ts, tests/e2e/homepage.spec.ts, tests/e2e/newsletter-popup.spec.ts. Do not edit docs.
 
 1. playwright.config.ts: set workers to process.env.CI ? 1 : 2. Change nothing else.
 
@@ -158,3 +158,22 @@ Read CLAUDE.md, playwright.config.ts, tests/e2e/homepage.spec.ts and tests/e2e/n
 
 4. Run: npx playwright test tests/e2e --project=chromium --repeat-each=3 --retries=0
    Show the output. If anything fails, do not change assertions; tell me the test, the error, and whether evidence points to the site or the test.                                                                                                                                            
+
+**What Claude did:** Set workers to 2 locally (1 on CI). Added a precondition guard to the BUG-001 test (skip with a reason if the pop-up is already open before the click). Inspected the four header panels using ariaSnapshot (after a textContent attempt gave wrong spacing) and replaced the count-of-all-links assertion with one panel-specific link per menu: visible after opening, hidden after closing. Ran tests/e2e with --repeat-each=3 --retries=0: 26/27 passed; the BUG-001 test failed as expected 3/3 with no skips. One "Services" dropdown run failed: aria-expanded stayed "false" after the click, with no pop-up activity in the log. Claude suggested this points to the site, while saying it had not looked at the trace.
+
+**What I changed / accepted / rejected:**
+Accepted the panel-link assertions because they prove the specific panel opened, not just that some link appeared, and they avoid the slow page-wide count(). [Your decision on long exact names vs regex, with reason.] Did not accept "site bug" for a 1-in-21 failure without a trace: a click landing before the page's JavaScript is ready, or a hover-opens/click-toggles menu, would produce the same symptom. Because of the time budget I time-boxed this to one read-only trace check and will document it as a known flaky test instead of running more investigation loops. Result of the stabilisation work: 21/27 to 26/27 with retries disabled.
+
+
+Do not edit any test, page object, config or docs file. You may create only these evidence files: docs/evidence/contact-inspection.txt and any screenshots named docs/evidence/contact-*.png. Run every step; write "not run" with the reason if a step cannot be done. Report raw findings, no root-cause conclusions. Then stop and wait.
+
+PART A - Services flaky failure (read-only, existing trace only, do not re-run tests)
+From the trace of the failed homepage "Services" test (repeat2) in test-results, report: time between navigation end and the click, the actions/events recorded between the click and the failed assertion, whether any hover or mouse-move event before the click is recorded, and whether the newsletter locator handler ran. If the trace is not available, write "not available".
+
+PART B - /contact form (abort every non-GET request and log method, URL and post body; log every third-party GET with full URL)
+1. Click "Next" with all fields empty. Report the exact visible error text near First name and Work email, and take a screenshot to docs/evidence/contact-empty-next.png.
+2. Type "not-an-email" in Work email, press Tab, report visible error text and aria-invalid. Then replace it with "qa-test@example.com", press Tab, report aria-invalid again.
+3. Report the closest dialog or landmark ancestor (role and accessible name) of the input named "Enter your work email".
+4. Fill First name "QA Test" and Work email "qa-test@example.com", click "Next". Open the "What do you need?" combobox and list all options in order.
+5. Pick the first non-placeholder option and click "Find a time". Report what appears: fields, buttons, iframes with their src domains, and every request logged or aborted after this click. Take a screenshot to docs/evidence/contact-find-a-time.png. Do NOT select a time slot, book anything or submit anything further.
+Save the full raw output to docs/evidence/contact-inspection.txt. Delete the scratch script.
