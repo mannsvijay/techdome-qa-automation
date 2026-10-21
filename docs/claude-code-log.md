@@ -89,7 +89,8 @@ B1. On the homepage, list every link or button named "Book call" or "Contact Us"
 
 Delete the scratch script, then stop.
 
-**What Claude did:** 
+
+**What Claude did:** Ran the investigation sequentially and saved raw output to docs/evidence/bug-001-investigation.txt plus a screenshot. A1: with no interaction, Services aria-expanded stayed "false" for 6s in both runs; the dialog appeared at 2095ms and 2951ms. A2: after clicking Services, aria-expanded became "true", and when the dialog became visible it was already "false", before any close click (2/2 runs). A3: closing the dialog added localStorage key td_nl_popup_until and GA cookies; the dialog did not reappear after reload or on /contact. B1: no element named "Book call" was found on the homepage; only "Contact Us" in the banner.
 
 **What I changed / accepted / rejected:**
- 
+This experiment separated the two explanations I had for the dropdown failures. My own hypothesis (the locator handler's close click acting as an outside click) was wrong: the pop-up collapses the open menu as soon as it appears, so this is a real site bug and I rewrote BUG-001 with these steps. Claude's original "site bug" label was partly right, but it had no evidence at the time and also blamed failure shape 1, which did not reproduce in sequential runs. I worked out that td_nl_popup_until is set 14 days ahead, so dismissal is remembered; I lowered BUG-001 to Medium because only first visits are affected, and used this key to suppress the pop-up in tests instead of racing it. [B1 decision: BUG-003 corrected with location X / removed because "Book call" could not be found.]

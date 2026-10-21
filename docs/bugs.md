@@ -63,7 +63,7 @@ All four menu buttons were affected across different runs (not one specific butt
 **Evidence:** `docs/exploration-notes.md` ("Odd things" section); tracked in `docs/user-story-map.md` US-016.
 
 ---
-
+<!-- 
 ## BUG-004
 
 **Severity:** Medium
@@ -81,4 +81,4 @@ All four menu buttons were affected across different runs (not one specific butt
 
 **Note:** Not yet visually confirmed whether this field is genuinely hidden/off-canvas (and so harmless) or reachable via keyboard/tab order (a real accessibility concern). Flagging for follow-up visual/keyboard verification before raising severity further.
 
-**Evidence:** Captured via a read-only Playwright inspection script against `/contact` (DOM validity dump); reproducible on every page load.
+**Evidence:** Captured via a read-only Playwright inspection script against `/contact` (DOM validity dump); reproducible on every page load. -->
