@@ -25,3 +25,13 @@ What I changed / accepted / rejected: Accepted all of it. Added retries: 1 mysel
 **What I changed / accepted / rejected:**
 Accepted: role/label selectors, never navigating to third-party sites, never submitting the live form.
 Changed: (1) the plan assumed the contact form sends a POST, which I had not verified, so I deferred the intercept fixture until I observe the real request. (2) Reading hrefs alone cannot catch a 404, so I will status-check every unique internal footer link sequentially (about 35 requests) instead of clicking 4 samples. (3) Scoped header and footer locators with banner and contentinfo roles to avoid duplicate-name strict-mode errors. (4) Asked for one spec file at a time instead of all 5, so I can review and run each
+
+
+
+## Prompt #4
+**What I asked:** Approved with changes. Create utils/helpers.ts and utils/pages/HomePage.ts with header locators scoped to getByRole('banner') and footer to getByRole('contentinfo'). Do not create ContactPage or the intercept fixture yet because we have not observed the contact request. Write tests/e2e/homepage.spec.ts for US-001 only, but first inspect how Services, Portfolio, Insights and Company behave and tell me before asserting. Collect console errors and attach them without failing on third-party errors. If a test fails, do not change the assertion; tell me if it is a site bug or a test bug.
+
+**What Claude did:** Inspected the live site with scratch scripts first. Found that the four header items are dropdown buttons (aria-haspopup), not links, and that a delayed newsletter modal with a full-screen backdrop blocks header clicks. Then wrote helpers.ts, HomePage.ts and 7 tests (title and meta description, hero heading, logo href, 4 dropdown open/close tests). All 7 passed.
+
+**What I changed / accepted / rejected:**
+Accepted the inspect-before-assert approach: my own notes and US-001 assumed these were links, and Claude's inspection proved that wrong, so I rewrote US-001 to describe dropdown behaviour. I did not accept the manual popup-dismiss helper as final: because the popup timing is inconsistent (it did not appear in one inspection run), I asked for page.addLocatorHandler instead and re-ran the spec with --repeat-each=3 to check for flakiness.
