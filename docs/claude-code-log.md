@@ -1,10 +1,10 @@
-Prompt #1
-What I asked: Read CLAUDE.md and docs/QA-Playwright-Assignment.pdf. Then update playwright.config.ts: set baseURL to    
+## Prompt #1
+**What I asked**: Read CLAUDE.md and docs/QA-Playwright-Assignment.pdf. Then update playwright.config.ts: set baseURL to    
   https://techdome.io, workers to 4, screenshot and trace on failure, and keep only the chromium project    
   for now. Do not write any tests yet. Show me the diff before applying it.
 
-What Claude did: Showed a diff for playwright.config.ts: baseURL, workers 4, trace retain-on-failure, screenshot only-on-failure, removed firefox/webkit.
-What I changed / accepted / rejected: Accepted all of it. Added retries: 1 myself because the target is a live site. Verified workers is under the 5-user limit.
+**What Claude did**: Showed a diff for playwright.config.ts: baseURL, workers 4, trace retain-on-failure, screenshot only-on-failure, removed firefox/webkit.
+**What I changed / accepted / rejected**: Accepted all of it. Added retries: 1 myself because the target is a live site. Verified workers is under the 5-user limit.
 
 ---
 
@@ -35,3 +35,27 @@ Changed: (1) the plan assumed the contact form sends a POST, which I had not ver
 
 **What I changed / accepted / rejected:**
 Accepted the inspect-before-assert approach: my own notes and US-001 assumed these were links, and Claude's inspection proved that wrong, so I rewrote US-001 to describe dropdown behaviour. I did not accept the manual popup-dismiss helper as final: because the popup timing is inconsistent (it did not appear in one inspection run), I asked for page.addLocatorHandler instead and re-ran the spec with --repeat-each=3 to check for flakiness.
+
+
+## Prompt #5
+**What I asked:** Do not change any test or page object code in this batch. Investigation only, then wait for my approval.
+
+PART A - Diagnose the 7 dropdown failures before calling them a site bug
+1. Show me the current dropdown test code from tests/e2e/homepage.spec.ts.
+2. Open the trace for one failure of each shape ("Expected false, Received ''" and "Expected true, Received false") using the files in test-results. Give me a timeline in ms: when the dialog appeared, when the locator handler clicked "Close newsletter pop-up", when the test clicked the menu button, and the aria-expanded value at each point.
+3. Test this hypothesis with a scratch script outside the repo: open "Services", wait until aria-expanded is "true", then wait for the newsletter dialog and close it with its close button. Report whether aria-expanded becomes "false" after the close click. Repeat once.
+4. In a fresh context, close the dialog with its button, then list any cookie or localStorage/sessionStorage key that was added. Reload and wait 6 seconds: does the dialog come back?
+5. Based on evidence only, tell me: site bug, test bug, or test-induced side effect. Then propose (do not apply) the most deterministic fix.
+
+PART B - Contact form follow-up (read-only, same rules: abort every non-GET request and log it)
+1. Click "Next" with empty fields and report any visible error text near First name and Work email (text content, not just aria-invalid).
+2. Type "not-an-email" in Work email, then the valid "qa-test@example.com", press Tab to blur, and report aria-invalid after blur.
+3. Find which container owns the "Enter your work email" input: is it inside the newsletter dialog, a chat widget, or the footer? Report its closest landmark or dialog ancestor.
+4. On step 2, list all options of the "What do you need?" combobox. Pick the first non-placeholder option, click "Find a time", and report what appears (fields, iframes and their src domains) and every request logged or aborted. Do NOT select a time slot or submit anything beyond that.
+5. Delete scratch scripts, then stop and wait.
+
+**What Claude did:** Inspected the newsletter dialog before writing code and found its accessible name is "One engineering note, every other Monday." (via aria-labelledby), not "Techdome newsletter" as I had specified; the close button is role=button "Close newsletter pop-up". Replaced the manual dismissal with page.addLocatorHandler() in HomePage.goto(). Ran the homepage spec with --repeat-each=3 --retries=0: 14 passed, 7 failed, all in the four dropdown tests. Claude labelled these a site bug. Measured popup appearance at 2149, 2236 and 2170 ms after load and saved docs/evidence/bug-001-newsletter-popup.png. Inspected /contact with non-GET requests aborted: only two GA beacons were aborted, no form request fired on "Next", step 2 shows a "What do you need?" combobox, "Back" and "Find a time".
+
+**What I changed / accepted / rejected:**
+Accepted Claude's correction of the dialog name; my name came from the visible label, which is not the ARIA name, and would have matched zero elements. Rejected the "site bug" verdict for now: Claude called the failures unpredictable, but its own timings are consistent (~2.2s), and the old dismissal waited for the popup before interacting while the new handler does not. My hypothesis is that the handler's click on the close button acts as an outside click that closes the open dropdown, so the flakiness may be caused by my own change. I asked for trace evidence before logging anything in bugs.md. Also did not accept two unverified claims: that the extra "Enter your work email" input belongs to a chat widget, and the aria-invalid result after a valid email (no blur was done). Corrected BUG-001: the timing is consistent, not random. 
+
