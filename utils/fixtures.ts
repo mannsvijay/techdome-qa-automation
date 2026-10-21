@@ -19,6 +19,14 @@ export const test = base.extend({
         window.localStorage.setItem('td_nl_popup_until', String(oneDayFromNow));
       }
     });
+
+    // GA4 "collect" beacons fire on real page views and custom events (confirmed in
+    // docs/evidence/contact-inspection.txt and contact-find-a-time.txt — every
+    // /contact load and step transition sends one to google-analytics.com/google.com).
+    // Aborting them here stops every test run from reporting fake traffic and fake
+    // events into Techdome's real GA property.
+    await page.route('**/g/collect**', (route) => route.abort());
+
     await use(page);
   },
 });
