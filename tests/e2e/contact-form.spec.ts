@@ -11,7 +11,8 @@ import { ContactPage } from '../../utils/pages/ContactPage';
  * - Work email is a native type="email" input, so an invalid value fails native
  *   constraint validation without any custom JS.
  * - "What do you need?" is a native <select> that only appears once step 2 renders,
- *   with exactly 6 options in a fixed order.
+ *   with a "Select…" placeholder (selected by default) followed by 6 options in a
+ *   fixed order.
  * - No request to techdome.io itself (GET or otherwise) was ever recorded while
  *   moving from step 1 to step 2 — it's a client-side-only transition.
  *
@@ -65,8 +66,12 @@ test.describe('US-003 / US-004: Contact form validation and step transition', ()
 
     await expect(contactPage.whatDoYouNeedSelect).toBeVisible();
 
-    const optionTexts = await contactPage.whatDoYouNeedSelect.locator('option').allTextContents();
-    expect(optionTexts.map((t) => t.trim())).toEqual([
+    // The select has a non-selectable "Select…" placeholder as its first option,
+    // selected by default — confirmed directly against the live DOM, not dropped
+    // from this assertion.
+    const optionTexts = (await contactPage.whatDoYouNeedSelect.locator('option').allTextContents()).map((t) => t.trim());
+    expect(optionTexts[0]).toBe('Select…');
+    expect(optionTexts.slice(1)).toEqual([
       'Engineering Pods / Staff Augmentation',
       'Automation / n8n',
       'AI / GenAI',
@@ -74,6 +79,11 @@ test.describe('US-003 / US-004: Contact form validation and step transition', ()
       'Venture Studio',
       'Something else',
     ]);
+
+    const selectedOptionText = await contactPage.whatDoYouNeedSelect.evaluate(
+      (el: HTMLSelectElement) => el.options[el.selectedIndex]?.textContent?.trim()
+    );
+    expect(selectedOptionText).toBe('Select…');
 
     expect(nonGetToTechdome).toEqual([]);
   });

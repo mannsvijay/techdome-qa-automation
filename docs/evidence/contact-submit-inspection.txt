@@ -1,0 +1,77 @@
+=== Navigating to /contact ===
+Newsletter popup did not appear within 3s.
+
+=== STEP 1: fill step 1, Next, select engagement type, click Find a time ===
+Selected "Engineering Pods / Staff Augmentation"
+Clicked "Find a time" (first time): OK
+
+=== STEP 2: fill remaining fields, pick first non-placeholder options ===
+Filled "What are you looking to build or staff?"
+Team size needed: selected "1–2" (options were ["Select…","1–2","3–5","6–10","10+","Not sure"])
+Timeline: selected "Immediately" (options were ["Select…","Immediately","Within 1 month","1–3 months","3–6 months","6+ months","Not decided"])
+Budget range: selected "Not decided" (options were ["Select…","Not decided","Under $10K","$10K – $25K","$25K – $50K","$50K – $100K","$100K+"])
+
+=== Identifying the next button to click ===
+Visible buttons just before clicking next step: ["Services","Portfolio","Insights","Company","Back","Find a time","How does Techdome differ from a traditional software dev agency?","Why are client projects anonymized on your website?","How quickly can a Dedicated Engineering Pod start working?","What engagement models and pricing structures do you offer?","How do you handle intellectual property (IP) and data compliance?","What happens during the 30-minute architecture scoping call?","How to choose a custom software development partner for startups?","What is the difference between IT staff augmentation and outsourcing?","How long does it take to build an MVP from scratch?","Subscribe","Cookie settings","Dismiss greeting","Open Pod chat"]
+"Find a time" button still present (count=1)
+Clicked the next-step button ("Find a time"): OK
+
+=== Reporting what appears after the click ===
+Visible textboxes: ["What are you looking to build or staff? *","Enter your work email"]
+Visible buttons: ["Services","Portfolio","Insights","Company","Back","Find a time","How does Techdome differ from a traditional software dev agency?","Why are client projects anonymized on your website?","How quickly can a Dedicated Engineering Pod start working?","What engagement models and pricing structures do you offer?","How do you handle intellectual property (IP) and data compliance?","What happens during the 30-minute architecture scoping call?","How to choose a custom software development partner for startups?","What is the difference between IT staff augmentation and outsourcing?","How long does it take to build an MVP from scratch?","Subscribe","Cookie settings","Dismiss greeting","Open Pod chat"]
+Visible comboboxes: ["What do you need? *","Team size needed","Timeline","Budget range"]
+Iframes: []
+Dialogs present (count=0)
+Screenshot saved: C:\Users\mnvj6\OneDrive\Documents\techdome assesment\docs\evidence\contact-submit-after-click.png
+
+Requests logged (allowed GET-with-query or aborted non-GET) AFTER clicking the next-step button:
+[
+  {
+    "method": "POST",
+    "url": "https://techdome.io/api/leads",
+    "contentType": "application/json",
+    "postData": "{\"service\":\"staff-aug\",\"contact\":{\"firstName\":\"QA Test\",\"lastName\":\"\",\"email\":\"qa-test@example.com\",\"company\":\"\"},\"answers\":{\"requirement\":\"QA automation test - please ignore\",\"teamSize\":\"1–2\",\"timeline\":\"Immediately\",\"budget\":\"Not decided\"},\"utm\":{},\"attribution\":{},\"landingPage\":\"/contact\",\"website\":\"\"}",
+    "outcome": "aborted"
+  },
+  {
+    "method": "POST",
+    "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6al0h2v894200556za200zb9265069981zd9265069981xf1&_p=1792618095141&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&_eu=AAAAAAQ&cid=1923630380.1792618096&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=2&tag_exp=115938465~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792618095&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=form_step_completed&_ee=1&ep.step=contact&_et=1690&tfd=9340",
+    "contentType": null,
+    "postData": null,
+    "outcome": "aborted"
+  },
+  {
+    "method": "POST",
+    "url": "https://www.google.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6al0h2v894200556za200zb9265069981zd9265069981xf1&_p=1792618095141&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&_eu=AAAAAAQ&cid=1923630380.1792618096&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=2&tag_exp=115938465~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792618095&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=form_step_completed&_ee=1&ep.step=contact&_et=1690&tfd=9340&gaf=1",
+    "contentType": null,
+    "postData": null,
+    "outcome": "aborted"
+  }
+]
+
+=== FULL REQUEST SUMMARY (entire session) ===
+Non-GET requests aborted (count=5):
+ - POST https://www.google-analytics.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6al0h2v894200556za208zb9265069981zd9265069981xf1&_p=1792618095141&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&cid=1923630380.1792618096&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=1&tag_exp=115938465~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792618095&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=2638
+   content-type: null
+   body: null
+ - POST https://www.google.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6al0h2v894200556za208zb9265069981zd9265069981xf1&_p=1792618095141&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&cid=1923630380.1792618096&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=1&tag_exp=115938465~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792618095&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=2638&gaf=1
+   content-type: null
+   body: null
+ - POST https://techdome.io/api/leads
+   content-type: "application/json"
+   body: "{\"service\":\"staff-aug\",\"contact\":{\"firstName\":\"QA Test\",\"lastName\":\"\",\"email\":\"qa-test@example.com\",\"company\":\"\"},\"answers\":{\"requirement\":\"QA automation test - please ignore\",\"teamSize\":\"1–2\",\"timeline\":\"Immediately\",\"budget\":\"Not decided\"},\"utm\":{},\"attribution\":{},\"landingPage\":\"/contact\",\"website\":\"\"}"
+ - POST https://www.google-analytics.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6al0h2v894200556za200zb9265069981zd9265069981xf1&_p=1792618095141&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&_eu=AAAAAAQ&cid=1923630380.1792618096&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=2&tag_exp=115938465~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792618095&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=form_step_completed&_ee=1&ep.step=contact&_et=1690&tfd=9340
+   content-type: null
+   body: null
+ - POST https://www.google.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6al0h2v894200556za200zb9265069981zd9265069981xf1&_p=1792618095141&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&_eu=AAAAAAQ&cid=1923630380.1792618096&frm=0&ngs=1&pscdl=noapi&rcb=13&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=2&tag_exp=115938465~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792618095&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=form_step_completed&_ee=1&ep.step=contact&_et=1690&tfd=9340&gaf=1
+   content-type: null
+   body: null
+
+GET requests with a query string (count=7):
+ - https://techdome.io/_next/image?url=%2Ftechdome-logo-big.png&w=384&q=75
+ - https://techdome.io/_next/image?url=%2Ftechdome-logo-big-reversed.png&w=384&q=75
+ - https://www.googletagmanager.com/gtm.js?id=GTM-5ZVXKBT2
+ - https://techdome.io/?_rsc=8k6vkql5ktX3Dkf2
+ - https://www.googletagmanager.com/gtag/js?id=G-D3NY626SEL
+ - https://www.googletagmanager.com/gtag/js?id=G-D3NY626SEL&cx=c&gtm=4e6al0h2
+ - https://techdome.io/_next/image?url=%2Fimages%2Flogos%2Fclutch.png&w=32&q=75

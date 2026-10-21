@@ -187,12 +187,8 @@ The trace ruled out the hover theory for the flaky Services test; a click 196ms 
 
 
 
-
-
-
-
-
-Read CLAUDE.md, utils/fixtures.ts, utils/pages/HomePage.ts and docs/evidence/contact-inspection.txt. Do only this batch. You may create or edit only: utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts, docs/evidence/contact-find-a-time.png, docs/evidence/contact-find-a-time.txt. Do not edit any other docs.
+## Prompt #12
+**What I asked:** Read CLAUDE.md, utils/fixtures.ts, utils/pages/HomePage.ts and docs/evidence/contact-inspection.txt. Do only this batch. You may create or edit only: utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts, docs/evidence/contact-find-a-time.png, docs/evidence/contact-find-a-time.txt. Do not edit any other docs.
 
 PART A - Finish the /contact inspection (scratch script outside the repo, abort every non-GET request and log method, URL and post body)
 1. Fill First name "QA Test", Work email "qa-test@example.com", click "Next". The "What do you need?" combobox may be a native select, so use selectOption, not option clicks. Select "Engineering Pods / Staff Augmentation".
@@ -210,3 +206,53 @@ PART B - ContactPage and tests (US-003, US-004), based only on facts already rec
    Never click "Find a time" in tests. No try/catch.
 4. Run: npx playwright test tests/e2e/contact-form.spec.ts --project=chromium --repeat-each=3 --retries=0
    Show the code, then the output. If anything fails, do not change assertions; tell me the test, the error, and whether evidence points to the site or the test.
+
+**What Claude did:** Finished the /contact inspection: confirmed "What do you need?" is a native select (selectOption works); "Back" keeps First name and Work email values; "Find a time" does not submit or call the network, but reveals four more fields on the same panel ("What are you looking to build or staff?" with an immediate "Required." error, plus Team size needed, Timeline and Budget range selects). Added GA collect-beacon blocking to the shared fixture, created ContactPage.ts and contact-form.spec.ts with three tests. Run: 6/9 passed; test c failed 3/3 because the select has a "Select…" placeholder not in my expected list. Claude identified this as a test bug.
+
+**What I changed / accepted / rejected:**
+Accepted Claude's diagnosis: the placeholder is normal, and the "six options" fact I gave came from an inspection that read the accessibility tree, which did not show it. Lesson: "use only recorded facts" is only as good as how the facts were recorded. Instead of removing the placeholder from the assertion, I asked for it to be asserted as the first, default-selected option, which is a stronger check. Rejected the exact:false label locators because "Work email" could also match the newsletter input "Enter your work email"; asked for anchored regexes. Noted that "Find a time" is not the final submit, so the real submission request is still unknown, and that showing "Required." on a field the user has not touched yet is a UX bug candidate [manual check result].
+
+
+
+
+## Prompt #13
+**What I asked:** 
+Read CLAUDE.md, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts and docs/evidence/contact-find-a-time.txt. Do only this batch. You may edit only utils/pages/ContactPage.ts and tests/e2e/contact-form.spec.ts, and create only docs/evidence/contact-submit-inspection.txt and docs/evidence/contact-submit-*.png. Do not edit any other docs.
+
+PART A - Fix my test and locators
+1. Test c: the select has a "Select…" placeholder. Assert that "Select…" is the first option and is the selected value by default, then assert the remaining options are exactly the six listed, in order. Do not drop the placeholder from the assertion.
+2. ContactPage: replace exact:false label locators with anchored regexes (for example /^Work email/, /^First name/, /^Company/) so they cannot match the newsletter input "Enter your work email" or other labels. Add locators for "What are you looking to build or staff?", "Team size needed", "Timeline" and "Budget range".
+3. Run: npx playwright test tests/e2e/contact-form.spec.ts --project=chromium --repeat-each=3 --retries=0 and show the output. Do not change assertions if something fails; explain.
+
+PART B - Find the real submission request (scratch script outside the repo; abort EVERY non-GET request and log method, URL, headers content-type and full post body; also log every GET with a query string)
+1. Fill step 1 with "QA Test" / "qa-test@example.com", Next, select "Engineering Pods / Staff Augmentation", click "Find a time".
+2. Fill "What are you looking to build or staff?" with "QA automation test - please ignore", pick the first non-placeholder option in Team size needed, Timeline and Budget range, then click whatever button appears next. Report what happens, every request logged or aborted, and take a screenshot to docs/evidence/contact-submit-after-click.png.
+3. If a calendar, iframe or booking screen appears, stop there and report its domain. Do NOT pick a time slot or click anything that books or submits outside the aborted request.
+Save raw output to docs/evidence/contact-submit-inspection.txt. Delete the scratch script, then stop.
+
+
+**What Claude did:** Fixed test c to assert "Select…" as the first, default-selected option followed by the six real options, and switched ContactPage label locators to anchored regexes, adding locators for the four step-2 fields. Contact spec run: 6/9; test d failed 3/3 because its check, url.includes('techdome.io'), also matched GA beacon URLs whose dl= parameter contains the page URL. Claude identified this as its own test bug and left the assertion unchanged as instructed. With all fields filled, "Find a time" sent POST https://techdome.io/api/leads with a JSON body (service, contact, answers, utm, attribution, landingPage, website). The request was aborted, and the page showed "We couldn't submit your request right now. Please try again." No calendar or iframe appeared.
+
+**What I changed / accepted / rejected:**
+Accepted the diagnosis of test d; the fix is to compare the request hostname, not substring-match the whole URL. This was a bug in code Claude wrote in Prompt #14 that I had not caught in review. The key outcome is that "Find a time", which my notes assumed opened a calendar, is actually the final submit. Because I aborted every non-GET request instead of blocking only known endpoints, no fake lead reached Techdome's sales team. I added a permanent /api/leads abort in the shared fixture so this cannot happen by accident later. Recorded the error banner as a positive finding and planned a mocked-500 test for it. Noted that "website": "" may be a honeypot field, but did not assert it. Decided security tests will only cover client-side behaviour for injection, since testing server-side sanitisation would mean sending real leads; this scope limit goes in the README.
+
+
+
+// 14 
+Read CLAUDE.md, utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts and docs/evidence/contact-submit-inspection.txt. Do only this batch. You may edit or create only: utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts, tests/integration/contact-submission.spec.ts, tests/integration/third-party-scripts.spec.ts, tests/integration/http-status.spec.ts. Do not edit docs.
+
+SAFETY FIRST
+1. In utils/fixtures.ts, add a default route that aborts every request to "**/api/leads", with a comment: this guarantees no real lead is ever sent, even if a test forgets to mock it. Tests that need the endpoint register their own route afterwards, which takes precedence.
+2. Add a ContactPage method fillFullLead(data) that fills step 1, clicks Next, selects "What do you need?", clicks "Find a time" to reveal step 2 fields, and fills the requirement and the three selects. It must not click the final "Find a time".
+
+E2E (tests/e2e/contact-form.spec.ts)
+3. Fix test d: compare new URL(request.url()).hostname against techdome.io instead of substring-matching the full URL. Keep the assertion otherwise the same.
+4. Add test e (error state): mock "**/api/leads" to return status 500, fill the full lead, click "Find a time", expect the alert or banner "We couldn't submit your request right now. Please try again." to be visible and the form to stay on the same step. Use a role locator for the banner if it has one (alert/status); if it has none, tell me before falling back to text.
+
+INTEGRATION (use test from utils/fixtures.ts)
+5. contact-submission.spec.ts (US-009): mock "**/api/leads" with status 200 and an empty JSON body, fill the full lead with fake data, click "Find a time", capture the request, and assert method POST, content-type application/json, and the body structure: service, contact.firstName/lastName/email/company, answers.requirement/teamSize/timeline/budget, utm, attribution, landingPage, website, with the values I filled. Before writing any assertion about what the UI shows after a successful response, run it once and tell me what appeared.
+6. third-party-scripts.spec.ts (US-010): delay every request to googletagmanager.com by 5 seconds using page.route, load the homepage, and assert the hero heading is visible within 3 seconds of navigation start. Also report whether the GTM/gtag script tags have async or defer.
+7. http-status.spec.ts: use the request fixture (no browser) to GET "/" and "/contact" and expect 200, and GET "/qa-test-page-that-does-not-exist" and expect 404. Do not call /api/leads directly.
+
+8. Run: npx playwright test tests/e2e/contact-form.spec.ts tests/integration --project=chromium --repeat-each=2 --retries=0
+   Show the code, then the output. If anything fails, do not change assertions; explain whether evidence points to the site or the test.
