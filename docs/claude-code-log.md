@@ -75,3 +75,21 @@ Do not modify files, create tests, change assertions, or make recommendations. R
 **What I changed / accepted / rejected:**
 I wrote this prompt myself on top of the suggested one, adding rules not to re-run anything and to write "not run" instead of inferring. Accepted the findings as the real state of evidence. They rule out my earlier hypothesis for shape 1 (the handler did not cause it, since there was no click), and leave two explanations for shape 2: the handler's close click acting as an outside click (test-induced) or the dialog closing the menu when it opens (a real site issue). I designed the next experiment to separate these two instead of picking one, and asked for raw output to be saved in docs/evidence/ so the bug report has verifiable evidence.
 
+
+## Prompt #7
+**What I asked:** Do not edit any test, page object or docs file except the evidence files named below. Run every step; if a step fails or cannot be done, write "not run" with the reason. Do not state root causes. Use sequential fresh browser contexts, viewport 1280x720, no form submissions. Print raw results AND save the full raw output to docs/evidence/bug-001-investigation.txt.
+
+PART A - Header dropdown vs newsletter dialog (2 fresh loads each)
+A1. No interaction: from domcontentloaded until 6s, poll the "Services" header button every 200ms. Log each change of aria-expanded with timestamp, and the timestamp the newsletter dialog became visible.
+A2. Wait until aria-expanded on "Services" is "false". Click "Services" and confirm aria-expanded is "true" (record if it never becomes "true"). Do NOT close the dialog. Wait until the dialog is visible, then record aria-expanded immediately and 500ms later. Then click "Close newsletter pop-up" and record aria-expanded 500ms later. Save one screenshot at the moment the dialog is visible to docs/evidence/bug-001-menu-with-dialog.png.
+A3. Fresh context: record cookies, localStorage and sessionStorage, wait for the dialog, close it with its button, record them again and print the difference. Then reload, wait 6s and record whether the dialog appears. Then go to /contact, wait 6s and record whether it appears.
+
+PART B - "Book call" location (no clicks)
+B1. On the homepage, list every link or button named "Book call" or "Contact Us": href, closest landmark (banner, main, contentinfo) and nearest heading. Screenshot the "Book call" one to docs/evidence/bug-003-book-call-location.png.
+
+Delete the scratch script, then stop.
+
+**What Claude did:** 
+
+**What I changed / accepted / rejected:**
+ 

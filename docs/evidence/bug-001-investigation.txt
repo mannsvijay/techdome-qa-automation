@@ -1,0 +1,38 @@
+
+=== PART A1 — run 1 (no interaction, poll 6s) ===
+  [t=0ms] aria-expanded: undefined -> "false"
+  [t=2095ms] newsletter dialog became visible
+  final aria-expanded at t=6000ms window close: "false"
+
+=== PART A1 — run 2 (no interaction, poll 6s) ===
+  [t=0ms] aria-expanded: undefined -> "false"
+  [t=2951ms] newsletter dialog became visible
+  final aria-expanded at t=6000ms window close: "false"
+
+=== PART A2 — run 1 (click Services, leave dialog open, then close) ===
+  aria-expanded reached "false" after 263ms — OK
+  aria-expanded became "true" after click, 47ms — OK
+  aria-expanded immediately when dialog became visible: "false"
+  screenshot saved: C:\Users\mnvj6\OneDrive\Documents\techdome assesment\docs\evidence\bug-001-menu-with-dialog.png
+  aria-expanded 500ms after dialog became visible: "false"
+  aria-expanded 500ms after clicking "Close newsletter pop-up": "false"
+
+=== PART A2 — run 2 (click Services, leave dialog open, then close) ===
+  aria-expanded reached "false" after 234ms — OK
+  aria-expanded became "true" after click, 45ms — OK
+  aria-expanded immediately when dialog became visible: "false"
+  aria-expanded 500ms after dialog became visible: "false"
+  aria-expanded 500ms after clicking "Close newsletter pop-up": "false"
+
+=== PART A3 — single context: storage diff + reload/navigate persistence ===
+  storage BEFORE closing dialog:
+  {"cookies":[],"localStorage":{},"sessionStorage":{}}
+  storage AFTER closing dialog:
+  {"cookies":[{"name":"_ga","value":"GA1.1.296693907.1792614532","domain":".techdome.io","path":"/","expires":1827174532.264858,"httpOnly":false,"secure":false,"sameSite":"Lax"},{"name":"_ga_D3NY626SEL","value":"GS2.1.s1792614532$o1$g0$t1792614532$j60$l0$h0","domain":".techdome.io","path":"/","expires":1827174532.935594,"httpOnly":false,"secure":false,"sameSite":"Lax"}],"localStorage":{"td_nl_popup_until":"1793824132926"},"sessionStorage":{}}
+  storage DIFF (before -> after):
+  {"cookies":{"_ga":{"before":null,"after":"GA1.1.296693907.1792614532"},"_ga_D3NY626SEL":{"before":null,"after":"GS2.1.s1792614532$o1$g0$t1792614532$j60$l0$h0"}},"localStorage":{"td_nl_popup_until":{"before":null,"after":"1793824132926"}},"sessionStorage":{}}
+  dialog visible 6s after reload: false
+  dialog visible 6s after navigating to /contact: false
+
+=== PART B1 — "Book call" / "Contact Us" inventory (no clicks) ===
+  role=link name="Contact Us" [match 0] visible=true href="/contact" landmark="banner" nearestHeading=null
