@@ -8,7 +8,8 @@ import { collectConsoleErrors, ConsoleErrorEntry } from '../../utils/helpers';
  * Exploration showed Services/Portfolio/Insights/Company are dropdown-toggle buttons
  * (aria-haspopup="true"), not links to separate pages — so this file asserts dropdown
  * open/close behaviour for them, not navigation. A timed newsletter pop-up intercepts
- * header clicks a few seconds after load, so every test dismisses it first.
+ * header clicks a few seconds after load; HomePage.goto() registers a locator handler
+ * (page.addLocatorHandler) that closes it automatically whenever it appears.
  *
  * Console errors are collected and attached to the report for visibility only — this
  * file never fails a test because of a console error (including third-party ones).
@@ -27,7 +28,6 @@ test.describe('US-001: Homepage header navigation and metadata', () => {
 
     homePage = new HomePage(page);
     await homePage.goto();
-    await homePage.dismissNewsletterPopupIfPresent();
   });
 
   test.afterEach(async ({ page }, testInfo) => {

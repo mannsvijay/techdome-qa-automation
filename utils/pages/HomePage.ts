@@ -14,6 +14,7 @@ export class HomePage {
 
   readonly logoLink: Locator;
   readonly heroHeading: Locator;
+  readonly newsletterDialog: Locator;
   readonly newsletterCloseButton: Locator;
 
   constructor(page: Page) {
@@ -23,10 +24,23 @@ export class HomePage {
 
     this.logoLink = this.header.getByRole('link', { name: 'Techdome Venture Studio — home' });
     this.heroHeading = page.getByRole('heading', { level: 1 });
-    this.newsletterCloseButton = page.getByRole('button', { name: 'Close newsletter pop-up' });
+
+    // Accessible name verified against the live accessibility tree: the dialog is
+    // labelled by its heading ("One engineering note, every other Monday."), not by
+    // the visual "Techdome newsletter" eyebrow text, which plays no part in its ARIA name.
+    this.newsletterDialog = page.getByRole('dialog', { name: 'One engineering note, every other Monday.' });
+    this.newsletterCloseButton = this.newsletterDialog.getByRole('button', { name: 'Close newsletter pop-up' });
   }
 
   async goto(): Promise<void> {
+    // The newsletter pop-up appears a few seconds after load with a full-viewport
+    // backdrop that intercepts pointer events on the header until dismissed. Registering
+    // a locator handler means Playwright closes it automatically whenever it becomes
+    // visible, right before any action/assertion that would otherwise wait on it.
+    await this.page.addLocatorHandler(this.newsletterDialog, async () => {
+      await this.newsletterCloseButton.click();
+    });
+
     await this.page.goto('/');
   }
 
@@ -38,19 +52,5 @@ export class HomePage {
   /** A link inside the footer landmark, scoped so it can't collide with a same-named header link. */
   footerLink(name: string): Locator {
     return this.footer.getByRole('link', { name, exact: true });
-  }
-
-  /**
-   * The newsletter pop-up (role="dialog") appears a few seconds after load and its
-   * full-viewport backdrop intercepts pointer events on the header until dismissed.
-   * Call this before interacting with header controls. No-ops if the popup never appears.
-   */
-  async dismissNewsletterPopupIfPresent(timeout = 8000): Promise<void> {
-    try {
-      await this.newsletterCloseButton.waitFor({ state: 'visible', timeout });
-      await this.newsletterCloseButton.click();
-    } catch {
-      // Popup didn't appear within the timeout — nothing to dismiss.
-    }
   }
 }
