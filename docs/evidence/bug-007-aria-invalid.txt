@@ -1,0 +1,11 @@
+After "not-an-email" + Tab:
+  aria-invalid: "false"
+  native validationMessage: "Please include an '@' in the email address. 'not-an-email' is missing an '@'."
+
+After replacing with "qa-test@example.com" + Tab + 1s wait:
+  aria-invalid: "false"
+  native validationMessage: null
+  "Required." text visible count: 0
+  page body text contains the word "invalid": false
+
+NOT CONFIRMED: aria-invalid cleared to a non-"true" value after entering a valid email.

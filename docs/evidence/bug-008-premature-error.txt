@@ -1,0 +1,5 @@
+"What are you looking to build or staff?" field value after one "Find a time" click (nothing typed): ""
+aria-invalid on that field: "true"
+"Required." visible count on page: 1
+
+CONFIRMED: "Required." is shown under "What are you looking to build or staff?" immediately after one "Find a time" click, before the user ever typed anything into it — i.e. the field is validated prematurely as a side effect of revealing it, not because the user interacted with it.

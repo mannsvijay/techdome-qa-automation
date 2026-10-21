@@ -1,0 +1,14 @@
+Minimal JS snippet that builds the greeting (from the loaded bundle,
+confirmed earlier via docs/evidence/contact-submit-inspection.txt chain):
+
+  let i=`${g.firstName} ${g.lastName}`.trim(), a=g.email.trim(), ...
+  ...
+  M({name:i,email:a})   // stores the FULL "firstName lastName" string as `name`
+  ...
+  // later, in the confirmation JSX:
+  "Thank you", K.name ? `, ${K.name.split(" ")[0]}` : "", "!"
+
+Input used: First name = "Mary Ann"
+Confirmation heading text observed: "Thank you, Mary!"
+
+CONFIRMED: K.name.split(" ")[0] takes only the first space-delimited token, so a two-word first name like "Mary Ann" is truncated to "Mary" in the greeting.

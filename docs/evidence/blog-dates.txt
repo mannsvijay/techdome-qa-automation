@@ -1,0 +1,12 @@
+Blog/insights cards found (count=8):
+  [0] date=Oct 15, 2026 | title="API testing explained: types, what to automate, and tools" | href=/insights/api-testing-explained-types-and-what-to-automate
+  [1] date=Oct 15, 2026 | title="\"Automating mortgage back-office work with n8n\"" | href=/insights/automating-mortgage-back-office-with-n8n
+  [2] date=Oct 15, 2026 | title="The DevOps lifecycle, from commit to production" | href=/insights/devops-lifecycle-commit-to-production
+  [3] date=Oct 15, 2026 | title="Fixed price vs time and materials for a software project" | href=/insights/fixed-price-vs-time-and-materials-software-contract
+  [4] date=Oct 15, 2026 | title="A practical HIPAA checklist for app architecture" | href=/insights/hipaa-compliant-app-architecture-checklist
+  [5] date=Oct 15, 2026 | title="How long does it take to build an MVP? A realistic timeline" | href=/insights/how-long-does-it-take-to-build-an-mvp
+  [6] date=Oct 15, 2026 | title="\"Multi-tenant SaaS on PostgreSQL: schema or row-level isolation\"" | href=/insights/multi-tenant-saas-postgresql-schema-vs-row-level-isolation
+  [7] date=Oct 15, 2026 | title="\"n8n vs Zapier vs Make: which one for business automation\"" | href=/insights/n8n-vs-zapier-vs-make-business-automation
+
+Unique dates: ["Oct 15, 2026"]
+CONFIRMED: all 8 blog cards show the identical date "Oct 15, 2026".
