@@ -165,7 +165,8 @@ Do not edit any test, page object, config or docs file in this batch. Diagnosis 
 Accepted the panel-link assertions because they prove the specific panel opened, not just that some link appeared, and they avoid the slow page-wide count(). [Your decision on long exact names vs regex, with reason.] Did not accept "site bug" for a 1-in-21 failure without a trace: a click landing before the page's JavaScript is ready, or a hover-opens/click-toggles menu, would produce the same symptom. Because of the time budget I time-boxed this to one read-only trace check and will document it as a known flaky test instead of running more investigation loops. Result of the stabilisation work: 21/27 to 26/27 with retries disabled.
 
 
-Do not edit any test, page object, config or docs file. You may create only these evidence files: docs/evidence/contact-inspection.txt and any screenshots named docs/evidence/contact-*.png. Run every step; write "not run" with the reason if a step cannot be done. Report raw findings, no root-cause conclusions. Then stop and wait.
+## Prompt #11
+**What I asked:** Do not edit any test, page object, config or docs file. You may create only these evidence files: docs/evidence/contact-inspection.txt and any screenshots named docs/evidence/contact-*.png. Run every step; write "not run" with the reason if a step cannot be done. Report raw findings, no root-cause conclusions. Then stop and wait.
 
 PART A - Services flaky failure (read-only, existing trace only, do not re-run tests)
 From the trace of the failed homepage "Services" test (repeat2) in test-results, report: time between navigation end and the click, the actions/events recorded between the click and the failed assertion, whether any hover or mouse-move event before the click is recorded, and whether the newsletter locator handler ran. If the trace is not available, write "not available".
@@ -177,3 +178,35 @@ PART B - /contact form (abort every non-GET request and log method, URL and post
 4. Fill First name "QA Test" and Work email "qa-test@example.com", click "Next". Open the "What do you need?" combobox and list all options in order.
 5. Pick the first non-placeholder option and click "Find a time". Report what appears: fields, buttons, iframes with their src domains, and every request logged or aborted after this click. Take a screenshot to docs/evidence/contact-find-a-time.png. Do NOT select a time slot, book anything or submit anything further.
 Save the full raw output to docs/evidence/contact-inspection.txt. Delete the scratch script.
+
+**What Claude did:** Part A, from the existing trace: the failing Services click happened 196ms after navigation ended, with no hover or mouse-move event and no locator-handler invocation. Part B on /contact: empty "Next" shows "Required." under First name and Work email, with aria-invalid="true" but no aria-describedby linking the text to the inputs. After entering a valid email and pressing Tab, aria-invalid stayed "true". The "Enter your work email" input was not found this time. Listed the six "What do you need?" options. The option click timed out, so "Find a time" was never clicked. Valid "Next" fired a GA form_step_completed event, which was aborted.
+
+**What I changed / accepted / rejected:**
+The trace ruled out the hover theory for the flaky Services test; a click 196ms after load suggests the page was not yet interactive, but this is not proven. I time-boxed it and documented it as a known flaky test instead of adding a click-retry, because a retry would hide a dead click that real users might also hit. The step 5 timeout was a bug in Claude's script, not the site: the combobox looks like a native select, which needs selectOption, not clicks on options. Confirmed that dropping BUG-004 was right, since the extra email input only exists with the pop-up. Logged two accessibility findings to verify: error text not linked via aria-describedby, and aria-invalid staying "true" after a valid email [manual check result]. Noticed my tests were sending fake GA events to Techdome's real analytics, so I decided to block collect beacons in the shared fixture.
+
+
+
+
+
+
+
+
+
+Read CLAUDE.md, utils/fixtures.ts, utils/pages/HomePage.ts and docs/evidence/contact-inspection.txt. Do only this batch. You may create or edit only: utils/fixtures.ts, utils/pages/ContactPage.ts, tests/e2e/contact-form.spec.ts, docs/evidence/contact-find-a-time.png, docs/evidence/contact-find-a-time.txt. Do not edit any other docs.
+
+PART A - Finish the /contact inspection (scratch script outside the repo, abort every non-GET request and log method, URL and post body)
+1. Fill First name "QA Test", Work email "qa-test@example.com", click "Next". The "What do you need?" combobox may be a native select, so use selectOption, not option clicks. Select "Engineering Pods / Staff Augmentation".
+2. Click "Back" and report whether First name and Work email still hold their values. Then click "Next" again.
+3. Click "Find a time". Report fields, buttons, iframes with src domains, and every request logged or aborted after this click. Screenshot to docs/evidence/contact-find-a-time.png and save raw output to docs/evidence/contact-find-a-time.txt. Do NOT pick a time slot or submit anything further. Delete the scratch script.
+
+PART B - ContactPage and tests (US-003, US-004), based only on facts already recorded in docs/evidence/contact-inspection.txt
+1. In utils/fixtures.ts, also abort requests matching "**/g/collect**" in the page fixture, so tests do not send fake analytics events to Techdome's real GA. Add a comment explaining why.
+2. Create utils/pages/ContactPage.ts with role/label locators for First name, Last name, Work email, Company, Next, the "What do you need?" combobox, Back and Find a time.
+3. Create tests/e2e/contact-form.spec.ts using test from utils/fixtures.ts:
+   a. Empty "Next": "Required." is shown twice and First name and Work email have aria-invalid "true"; the combobox is not visible. The error text is not linked via aria-describedby, so a text locator scoped to the form is the only option here; add a comment saying this is a deliberate exception to the no-text-selector rule.
+   b. "not-an-email" in Work email: the field's native validity is invalid and the form stays on step 1.
+   c. Valid First name and Work email, "Next": step 2 shows the combobox with exactly these options in order: "Engineering Pods / Staff Augmentation", "Automation / n8n", "AI / GenAI", "Product Development", "Venture Studio", "Something else".
+   d. In test c, also assert that no non-GET request to techdome.io was sent during step 1 to 2.
+   Never click "Find a time" in tests. No try/catch.
+4. Run: npx playwright test tests/e2e/contact-form.spec.ts --project=chromium --repeat-each=3 --retries=0
+   Show the code, then the output. If anything fails, do not change assertions; tell me the test, the error, and whether evidence points to the site or the test.

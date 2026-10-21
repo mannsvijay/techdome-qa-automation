@@ -1,0 +1,38 @@
+=== Navigating to /contact ===
+Newsletter popup did not appear on /contact within 3s.
+
+=== STEP 1: Click "Next" with all fields empty ===
+First name: aria-invalid="true", aria-describedby text=null
+Work email: aria-invalid="true", aria-describedby text=null
+Screenshot saved: C:\Users\mnvj6\OneDrive\Documents\techdome assesment\docs\evidence\contact-empty-next.png
+
+=== STEP 2: invalid email -> Tab -> valid email -> Tab ===
+After "not-an-email" + Tab: aria-invalid="true", aria-describedby text=null, native validationMessage="Please include an '@' in the email address. 'not-an-email' is missing an '@'."
+After "qa-test@example.com" + Tab: aria-invalid="true"
+
+=== STEP 3: closest dialog/landmark ancestor of "Enter your work email" ===
+Match count for "Enter your work email": 0
+STEP 3: not run — no element found with accessible name "Enter your work email"
+
+=== STEP 4: fill valid data, click Next, list combobox options ===
+Combobox "What do you need?" match count: 1
+Options in order (count=6): ["Engineering Pods / Staff Augmentation","Automation / n8n","AI / GenAI","Product Development","Venture Studio","Something else"]
+
+=== STEP 5: pick first non-placeholder option, click "Find a time" ===
+Picking option index 0: "Engineering Pods / Staff Augmentation"
+Clicking the option: not run — locator.click: Timeout 10000ms exceeded.
+"Find a time" button match count: 1
+STEP 5: not run — no "Find a time" button found after selecting the option
+
+=== FULL REQUEST SUMMARY (entire session) ===
+Non-GET requests aborted (count=4):
+ - POST https://www.google-analytics.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6ak1v894200556za208zb9265069981zd9265069981xf1&_p=1792617336349&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&cid=683921166.1792617337&frm=0&ngs=1&pscdl=noapi&rcb=9&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=1&tag_exp=115616986~115938465~115938469~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792617336&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=2823 | (no body)
+ - POST https://www.google.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6ak1v894200556za208zb9265069981zd9265069981xf1&_p=1792617336349&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&cid=683921166.1792617337&frm=0&ngs=1&pscdl=noapi&rcb=9&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=1&tag_exp=115616986~115938465~115938469~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792617336&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=2823&gaf=1 | (no body)
+ - POST https://www.google-analytics.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6ak1v894200556za200zb9265069981zd9265069981xf1&_p=1792617336349&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&_eu=AAAAAAQ&cid=683921166.1792617337&frm=0&ngs=1&pscdl=noapi&rcb=9&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=2&tag_exp=115616986~115938465~115938469~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792617336&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=form_step_completed&_ee=1&ep.step=contact&_et=3300&tfd=11130 | (no body)
+ - POST https://www.google.com/g/collect?v=2&tid=G-D3NY626SEL&gtm=45je6ak1v894200556za200zb9265069981zd9265069981xf1&_p=1792617336349&gcs=G111&gcd=13t3t3t3t5l1&npa=0&dma=0&_eu=AAAAAAQ&cid=683921166.1792617337&frm=0&ngs=1&pscdl=noapi&rcb=9&sr=1280x720&uaa=x86&uab=64&uafvl=Not%253AA-Brand%3B8.0.0.0%7CChromium%3B156.0.8078.4%7CHeadlessChrome%3B156.0.8078.4&uam=&uamb=0&uap=Windows&uapv=19.0.0&uaw=0&ul=en-us&_s=2&tag_exp=115616986~115938465~115938469~118897920~118897930~120213116~120385423~120469145~120469153~121246026~121246034&dp=%2Fcontact&dt=Contact%20Us%20%7C%20Techdome&sid=1792617336&sct=1&seg=0&dl=https%3A%2F%2Ftechdome.io%2Fcontact&en=form_step_completed&_ee=1&ep.step=contact&_et=3300&tfd=11130&gaf=1 | (no body)
+
+Third-party GET requests allowed (count=4):
+ - https://www.googletagmanager.com/gtm.js?id=GTM-5ZVXKBT2
+ - https://www.googletagmanager.com/gtag/js?id=G-D3NY626SEL
+ - https://www.googletagmanager.com/gtag/js?id=G-D3NY626SEL&cx=c&gtm=4e6ak0
+ - https://www.googletagmanager.com/td?id=GTM-5ZVXKBT2&v=3&t=t&pid=1395607691&gtm=45He6ak0v9265069981za200zd9265069981xf1&seq=1&exp=115938465~115938468~118897920~118897930~120385422~120469145~120469153~121246026~121246034&dl=techdome.io%2Fcontact&tdp=GTM-5ZVXKBT2;265069981;0;0;0&frm=0&rtg=265069981&slo=27&hlo=53&lst=1&bt=0&ct=3&z=0
