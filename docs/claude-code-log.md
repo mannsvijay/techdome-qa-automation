@@ -373,7 +373,8 @@ I reviewed load.spec.ts line by line for the hard limit: USERS is fixed at 5, ex
 
 
 // 19 
-Read CLAUDE.md, playwright.config.ts, tests/security/sensitive-data.spec.ts and tests/integration/third-party-scripts.spec.ts. Do only this batch. You may edit only these two spec files. Do not edit docs or any other file.
+## Prompt #19
+**What I asked:** Read CLAUDE.md, playwright.config.ts, tests/security/sensitive-data.spec.ts and tests/integration/third-party-scripts.spec.ts. Do only this batch. You may edit only these two spec files. Do not edit docs or any other file.
 
 1. sensitive-data.spec.ts: replace the per-address allowlist with a context rule. An email is skipped from the visibility assertion only if every occurrence in source is the value of a placeholder attribute (placeholder:"..." or placeholder="..."). Keep listing skipped emails in docs/evidence/security-sensitive-scan.txt marked "PLACEHOLDER (not asserted)". Any email that appears anywhere outside a placeholder must still be visible on the page or the test fails. Add a comment explaining the rule.
 
@@ -382,4 +383,36 @@ Read CLAUDE.md, playwright.config.ts, tests/security/sensitive-data.spec.ts and 
 3. Run the suite exactly as a reviewer would, with the default config: npx playwright test
    Report: total tests per project, passed, failed, flaky, skipped, expected failures (test.fail) with their bug annotations, whether the load project ran, and total duration. If anything fails, do not change assertions; tell me the test, the error and whether evidence points to the site or the test.
 
-   
+**What Claude did:** Replaced the per-address email allowlist with a context rule: an email is skipped only if every occurrence in source is a placeholder attribute value; both you@company.com and name@company.com are now reported as "PLACEHOLDER (not asserted)". Rewrote the third-party test to delay GTM by 5s and assert the hero is visible before the first delayed GTM response is released, instead of a 3-second wall-clock limit. Ran the suite with the default config (npx playwright test): 44 passed (43 chromium + 1 load), 0 failed, 0 flaky, 0 skipped; the BUG-001 and BUG-002 tests failed as expected; the load project ran after chromium; 2.0 minutes. Load p95 was 893ms with all 200s.
+
+**What I changed / accepted / rejected:**
+Accepted both changes after reading them: the placeholder rule still fails any email that appears outside a placeholder, so it fixes the false positive without loosening the check, and the ordering assertion tests what "non-blocking" actually means rather than how fast my laptop is. Noted one edge case I chose not to fix: if GTM ever stops loading, the third-party test would time out instead of failing with a clear message. Also noted that the load and security tests rewrite files under docs/ on every run, which I will explain in the README. This is the first fully green run as a reviewer would execute it, so my next step is a fresh-clone check outside my working folder.
+
+
+
+## Prompt #20
+**What I asked:** Do not edit any test, page object, spec or docs file. You may edit only package.json and .gitignore, and only if a step below requires it; show me the diff.
+
+1. Check .gitignore covers node_modules, test-results, playwright-report and blob-report. Report what is missing.
+2. In package.json, add "postinstall": "playwright install chromium" so a reviewer's npm install also installs the browser. Add a "test" script "playwright test". Show the diff.
+3. Commit nothing yourself. Tell me when step 2 is done and wait for me to push.
+
+After I push, do this:
+4. Clone https://github.com/mannsvijay/techdome-qa-automation into C:\dev\techdome-fresh (outside OneDrive). In that folder run: npm ci, then npx playwright test. Report every command's result, total tests per project, passed, failed, flaky, expected failures, and duration.
+5. Run npx tsc --noEmit in the fresh clone and report any type errors (do not fix them).
+6. Read .github/workflows/playwright.yml and tell me what it does: when it triggers, which browsers it installs, and whether it would run the load test on every push against the live site. Do not change it.
+7. Delete C:\dev\techdome-fresh at the end.
+
+**What Claude did:** Checked .gitignore: node_modules, test-results, playwright-report and blob-report were already covered, so no change was needed. Added two scripts to package.json: "test": "playwright test" and "postinstall": "playwright install chromium". Stopped without committing, as instructed, until I pushed. After the push: cloned the repo into C:\dev\techdome-fresh (outside OneDrive) and ran npm ci [result, and whether postinstall installed Chromium], then npx playwright test [X passed, Y failed, Z flaky, 2 expected failures (BUG-001, BUG-002), load project ran: yes/no, duration]. Ran npx tsc --noEmit: [no errors / list of errors]. Read .github/workflows/playwright.yml: [triggers on ..., installs ..., runs the load test on every push: yes/no]. Deleted the fresh clone.
+
+**What I changed / accepted / rejected:**
+I asked for the postinstall script because the assignment says the reviewer will run npx playwright test from a fresh clone, and without a browser installed that command fails even when the tests are correct; this way npm install prepares everything. I kept commits in my own hands so I could review the diff before it reached GitHub. I ran the check outside my OneDrive folder to rule out "works on my machine" issues from local state such as cached browsers or unignored files. [Your decision on type errors: fixed with @types/node / left as-is because Playwright does not type-check, with reason.] [Your decision on the CI workflow: kept it / changed it to manual trigger (workflow_dispatch) so pushes do not send unnecessary load to the live site, with
+
+
+## Prompt #21
+**What I asked:** Pushed. Continue with steps 4 to 7 exactly as written. Do not edit any file in the fresh clone or in my working folder.
+
+**What Claude did:** Confirmed .gitignore already covered node_modules, test-results, playwright-report and blob-report, and added "test" and "postinstall": "playwright install chromium" scripts to package.json. After I pushed, it cloned the repo into C:\dev\techdome-fresh outside OneDrive: npm ci installed 5 packages with 0 vulnerabilities and the postinstall installed Chromium; npx playwright test passed 44/44 (43 chromium + 1 load) with BUG-001 and BUG-002 failing as expected, 0 flaky, in 1.8 minutes, the same as locally. npx tsc --noEmit did not type-check anything because the repo has no tsconfig.json and no typescript dependency. The CI workflow runs on every push and pull request to main, installs all browsers, and runs the full suite including the load test against the live site. It also found three stray screenshot files with mangled path names in the repo root, left over from one of its own earlier scripts. Deleted the fresh clone.
+
+**What I changed / accepted / rejected:**
+The fresh-clone run proves the reviewer's single command works, which was the main goal. I removed the stray screenshots myself; they came from a path mistake in a Claude script that I had committed without checking the file list, so I now review git status before each commit. I changed the CI workflow to manual trigger only and Chromium only: running the full suite and load test against Techdome's production site on every push was unnecessary load, even within the 5-user limit, and I had not noticed my earlier pushes were triggering it. [Type-check: added tsconfig and typecheck script and fixed N errors / skipped and documented in README because Playwright compiles TypeScript without type-checking and time was limited.]
