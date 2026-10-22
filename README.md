@@ -52,7 +52,7 @@ Both are expected to fail and are counted as **passing** in the suite summary wh
 
 Last full run (`npx playwright test`, all projects, default config): **44 tests — 44 passed, 0 failed, 0 flaky, 0 skipped** (2.0m), including the two `test.fail()` tests above behaving as expected.
 
-Load test: **p95 893ms** overall (pass threshold: < 3000ms), **zero 5xx** (30/30 requests returned 200).
+Load test: **p95 2623 ms** overall (pass threshold: < 3000ms), **zero 5xx** (30/30 requests returned 200).
 
 - Bug tracker: [`docs/bugs.md`](docs/bugs.md) (8 documented bugs, BUG-001–BUG-008)
 - Load test report: [`docs/load-test-results.md`](docs/load-test-results.md)
