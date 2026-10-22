@@ -1,6 +1,6 @@
 # Load Test Results
 
-**Date/time:** 2026-10-21T23:07:34.317Z
+**Date/time:** 2026-10-22T19:27:17.944Z
 **Concurrent users:** 5
 **Rounds per user:** 3
 **Total requests:** 30 (5 users × 2 pages × 3 rounds)
@@ -11,9 +11,9 @@
 
 | Scope | Count | Min | Avg | p50 | p95 | Max |
 |---|---|---|---|---|---|---|
-| / | 15 | 376 | 588.1 | 479 | 925 | 925 |
-| /contact | 15 | 538 | 678.7 | 612 | 1066 | 1066 |
-| **Overall** | 30 | 376 | 633.4 | 597 | 925 | 1066 |
+| / | 15 | 393 | 817.4 | 497 | 1547 | 1547 |
+| /contact | 15 | 533 | 1260.2 | 587 | 2955 | 2955 |
+| **Overall** | 30 | 393 | 1038.8 | 578 | 2623 | 2955 |
 
 ## Status codes
 
@@ -23,5 +23,5 @@
 
 ## Verdict
 
-- p95 < 3000ms: **PASS** (overall p95 = 925ms)
+- p95 < 3000ms: **PASS** (overall p95 = 2623ms)
 - Zero 5xx errors: **PASS** (status counts: {"200":30})
